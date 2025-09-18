@@ -1,5 +1,5 @@
-from quarto_ai.interfaces.cli import QuartoCLI
+from quarto_ai.interfaces.cli import main
 
 
 if __name__ == "__main__":
-    QuartoCLI().run()
+    main()

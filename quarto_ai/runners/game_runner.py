@@ -14,7 +14,7 @@ class GameRunner:
         current_idx = self.game.current_player
         current_player = self.players[current_idx].name
         print("\n" + str(self.game))
-        print(f"{current_player} (Player {current_idx + 1}) to move.\n")
+        print(f"{current_player} (Player {current_idx}) to move.\n")
 
     def _play_turn(self) -> None:
         """Executes a single turn of the game."""
