@@ -1,6 +1,6 @@
 import copy
 import random
-from quarto_ai.ai.base import BaseModel
+from quarto_ai.players.base import BaseModel
 from quarto_ai.game.board import Board
 from quarto_ai.game.state import GameState
 from quarto_ai.game.piece import Piece
