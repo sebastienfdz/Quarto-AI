@@ -52,6 +52,6 @@ class Board:
             row = []
             for j in range(4):
                 piece = self.game_board[i, j]
-                row.append(str(piece) if piece else " . ")
+                row.append(str(piece) if piece else "..")
             rows.append(" | ".join(row))
         return "\n".join(rows)

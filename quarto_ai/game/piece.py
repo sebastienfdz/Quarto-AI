@@ -14,7 +14,7 @@ class Piece:
 
     def __str__(self) -> str:
         """Returns piece number (1 to 15)"""
-        return f" {self.to_bits():02d}"
+        return f"{self.to_bits():02d}"
 
 
 def generate_all_pieces() -> list[Piece]:
