@@ -23,19 +23,17 @@ class HumanPlayer(BaseModel):
 
     def choose_position(self, state: GameState, piece: Piece) -> tuple[int, int]:
         """Ask the user for a valid position (row, col)."""
-        while True:
-            try:
-                raw = self.input_func(f"Place piece {piece.to_bits():02d} (format: row,col): ")
-                x_str, y_str = raw.strip().split(",")
-                x, y = int(x_str), int(y_str)
+        prompt = f"Place piece {piece.to_bits():02d} (format: row,col): "
 
+        while True:
+            raw = self.input_func(prompt)
+            try:
+                x, y = self._parse_position(raw)
                 if (x, y) in state.get_available_positions():
                     return x, y
                 self.output_func("❌ Position unavailable. Try again.")
             except ValueError:
                 self.output_func("⚠️ Invalid format. Use format 'row,col' (e.g.: 0,3).")
-            except Exception as e:
-                self.output_func(f"⚠️ Error: {e}")
 
     def choose_piece(self, state: GameState) -> Piece:
         """Ask the user to select a piece for the opponent."""
@@ -45,10 +43,15 @@ class HumanPlayer(BaseModel):
         self.output_func(" ".join(f"{piece_id:02d}" for piece_id in remaining.keys()))
 
         while True:
+            raw = self.input_func("Choose the piece number (0–15): ")
             try:
-                choice = int(self.input_func("Choose the piece number (0–15): "))
+                choice = int(raw)
                 return remaining[choice]
             except KeyError:
                 self.output_func("❌ Invalid piece. Choose from the available ones.")
             except ValueError:
                 self.output_func("⚠️ Invalid input. Enter an integer.")
+
+    def _parse_position(self, raw: str) -> tuple[int, int]:
+        x_str, y_str = raw.strip().split(",")
+        return int(x_str), int(y_str)
