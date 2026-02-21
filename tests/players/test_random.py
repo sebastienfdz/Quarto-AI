@@ -34,6 +34,7 @@ def winning_game() -> GameState:
 
 
 def test_choose_piece_valid(new_game: GameState):
+    """Return a piece that is still available in the game state."""
     player = RandomAI()
     piece = player.choose_piece(new_game)
     remaining_pieces = new_game.get_remaining_pieces_list()
@@ -41,6 +42,7 @@ def test_choose_piece_valid(new_game: GameState):
 
 
 def test_choose_position_valid(new_game: GameState):
+    """Return a valid and currently available board position."""
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)
     x, y = player.choose_position(new_game, piece)
@@ -49,6 +51,7 @@ def test_choose_position_valid(new_game: GameState):
 
 
 def test_choose_position_winning(winning_game: GameState):
+    """Select the winning move when one is immediately available."""
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)
 
@@ -63,6 +66,7 @@ def test_choose_position_winning(winning_game: GameState):
 
 
 def test_is_winning_move_false(new_game: GameState):
+    """Return False when placing the piece doesn't results in a victory."""
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)
     is_winning = player._is_winning_move(new_game.board, 0, 0, piece)
@@ -70,6 +74,7 @@ def test_is_winning_move_false(new_game: GameState):
 
 
 def test_is_winning_move_true(winning_game: GameState):
+    """Return True when placing the piece results in a victory."""
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)
     is_winning = player._is_winning_move(winning_game.board, 0, 0, piece)
@@ -77,13 +82,15 @@ def test_is_winning_move_true(winning_game: GameState):
 
 
 def test_is_winning_move_unavailable(winning_game: GameState):
+    """Return False when placing the piece is not possible."""
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)
     is_winning = player._is_winning_move(winning_game.board, 1, 0, piece)
     assert not is_winning
 
 
-def test_is_winning_move_change_board(new_game: GameState):
+def test_is_winning_move_not_modify_board(new_game: GameState):
+    """Ensure the board state remains unchanged after simulating a move."""
     board = new_game.board
     player = RandomAI()
     piece = Piece(0, 0, 0, 0)

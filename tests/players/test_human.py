@@ -15,6 +15,7 @@ def new_game() -> GameState:
 
 
 def test_choose_position_valid(new_game: GameState):
+    """Returns the correct coordinates when the user provides a valid position."""
     inputs = iter(["0, 0"])
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
@@ -27,6 +28,7 @@ def test_choose_position_valid(new_game: GameState):
 
 
 def test_choose_position_retry(new_game: GameState):
+    """Retry after invalid format input and eventually return a valid position."""
     inputs = iter(["invalid position", "0, 0"])
     outputs = []
     player = HumanPlayer(
@@ -40,7 +42,8 @@ def test_choose_position_retry(new_game: GameState):
     assert any("Invalid format." in msg for msg in outputs)
 
 
-def test_choose_position_invalid_square(new_game: GameState):
+def test_choose_position_unavailable_square(new_game: GameState):
+    """Retry when the chosen position is already occupied."""
     inputs = iter(["0, 0", "1, 1"])
     outputs = []
     player = HumanPlayer(
@@ -56,6 +59,7 @@ def test_choose_position_invalid_square(new_game: GameState):
 
 
 def test_choose_piece_valid(new_game: GameState):
+    """Return the correct piece when the user selects a valid piece ID."""
     inputs = iter(["0"])
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
@@ -67,6 +71,7 @@ def test_choose_piece_valid(new_game: GameState):
 
 
 def test_choose_piece_retry_value_error(new_game: GameState):
+    """Retry when the user enters a non-integer piece ID."""
     inputs = iter(["invalid piece", "0"])
     outputs = []
     player = HumanPlayer(
@@ -80,6 +85,7 @@ def test_choose_piece_retry_value_error(new_game: GameState):
 
 
 def test_choose_piece_retry_key_error(new_game: GameState):
+    """Retry when the user selects a piece that is not available."""
     inputs = iter(["-100", "0"])
     outputs = []
     player = HumanPlayer(
@@ -93,11 +99,13 @@ def test_choose_piece_retry_key_error(new_game: GameState):
 
 
 def test_parse_position_valid():
+    """Correctly parse a well-formatted 'row,col' input string."""
     player = HumanPlayer()
     assert player._parse_position("0, 0") == (0, 0)
 
 
 def test_parse_position_invalid():
+    """Raise ValueError when the input format is invalid."""
     player = HumanPlayer()
     with pytest.raises(ValueError):
         player._parse_position("invalid raw input")
