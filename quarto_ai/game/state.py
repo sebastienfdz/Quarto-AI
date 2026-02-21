@@ -16,7 +16,7 @@ class GameState:
     def play_move(self, x: int, y: int, piece: Piece) -> None:
         """
         Place a piece on the board, and update the game state.
-        
+
         :raises GameEndedError: If the game is already over.
         :raises InvalidePieceError: If the piece is unavailable.
         :raises InvalidSquareError: If the square is unavailable.

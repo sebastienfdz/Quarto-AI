@@ -1,6 +1,5 @@
 import re
 import pytest
-from quarto_ai.game.board import Board
 from quarto_ai.game.piece import Piece
 from quarto_ai.game.state import GameState
 from quarto_ai.game.exceptions import GameEndedError, InvalidSquareError, InvalidPieceError
@@ -39,7 +38,7 @@ def game_draw() -> GameState:
     return game
 
 
-def test_game_victory() -> Board:
+def test_game_victory():
     """Create a game of Quarto with a winner."""
     game = GameState()
     remaining = game.get_remaining_pieces()
