@@ -8,9 +8,6 @@ from quarto_ai.players.human import HumanPlayer
 def new_game() -> GameState:
     """Create a new game of Quarto."""
     game = GameState()
-    assert game.winner is None
-    assert not game.board.is_full()
-    assert not game.board.check_victory()
     return game
 
 
@@ -21,7 +18,8 @@ def test_choose_position_valid(new_game: GameState):
         input_func=lambda _: next(inputs),
         output_func=lambda _: None,
     )
-    piece = Piece(0, 0, 0, 0)
+    piece = new_game.get_remaining_pieces_list()[0]
+    new_game.select_piece(piece)
 
     x, y = player.choose_position(new_game, piece)
     assert (x, y) == (0, 0)
@@ -35,7 +33,8 @@ def test_choose_position_retry(new_game: GameState):
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
     )
-    piece = Piece(0, 0, 0, 0)
+    piece = new_game.get_remaining_pieces_list()[0]
+    new_game.select_piece(piece)
 
     x, y = player.choose_position(new_game, piece)
     assert (x, y) == (0, 0)
@@ -50,9 +49,14 @@ def test_choose_position_unavailable_square(new_game: GameState):
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
     )
-    piece = Piece(0, 0, 0, 0)
-    new_game.play_move(0, 0, piece)
 
+    piece = new_game.get_remaining_pieces_list()[0]
+    new_game.select_piece(piece)
+    new_game.place_piece(0, 0)
+    piece = new_game.get_remaining_pieces_list()[0]
+    new_game.select_piece(piece)
+
+    # The player tries squares "0, 0" (occupied), then "1, 1" (available)
     x, y = player.choose_position(new_game, piece)
     assert (x, y) == (1, 1)
     assert any("Position unavailable." in msg for msg in outputs)

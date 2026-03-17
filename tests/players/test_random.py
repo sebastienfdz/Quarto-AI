@@ -8,9 +8,6 @@ from quarto_ai.players.ai.random_ai import RandomAI
 def new_game() -> GameState:
     """Create a new game of Quarto."""
     game = GameState()
-    assert game.winner is None
-    assert not game.board.is_full()
-    assert not game.board.check_victory()
     return game
 
 
@@ -21,15 +18,13 @@ def winning_game() -> GameState:
     Adding the piece (0, 0, 0, 0) in the square (0, 0) is winning.
     """
     game = GameState()
-    remaining = game.get_remaining_pieces()
+    pieces = game.get_remaining_pieces()
 
     for x in range(1, 4):
-        piece = remaining[x]
-        game.play_move(x, 0, piece)
+        game.select_piece(pieces[x])
+        game.place_piece(x, 0)
 
-    assert game.winner is None
-    assert not game.board.is_full()
-    assert not game.board.check_victory()
+    assert game.result is None
     return game
 
 
@@ -37,31 +32,29 @@ def test_choose_piece_valid(new_game: GameState):
     """Return a piece that is still available in the game state."""
     player = RandomAI()
     piece = player.choose_piece(new_game)
-    remaining_pieces = new_game.get_remaining_pieces_list()
-    assert piece in remaining_pieces
+    assert piece in new_game.get_remaining_pieces_list()
 
 
 def test_choose_position_valid(new_game: GameState):
     """Return a valid and currently available board position."""
     player = RandomAI()
-    piece = Piece(0, 0, 0, 0)
+    piece = new_game.get_remaining_pieces_list()[0]
+    new_game.select_piece(piece)
     x, y = player.choose_position(new_game, piece)
-    available_positions = new_game.get_available_positions()
-    assert (x, y) in available_positions
+    assert (x, y) in new_game.get_available_positions()
 
 
 def test_choose_position_winning(winning_game: GameState):
     """Select the winning move when one is immediately available."""
     player = RandomAI()
-    piece = Piece(0, 0, 0, 0)
+    piece = winning_game.get_remaining_pieces_list()[0]
+    winning_game.select_piece(piece)
 
     x, y = player.choose_position(winning_game, piece)
-    available_positions = winning_game.get_available_positions()
-    assert (x, y) in available_positions
     assert (x, y) == (0, 0)
 
-    winning_game.play_move(x, y, piece)
-    assert winning_game.winner is not None
+    winning_game.place_piece(x, y)
+    assert winning_game.result is not None
     assert winning_game.board.check_victory()
 
 

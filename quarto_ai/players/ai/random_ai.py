@@ -19,8 +19,7 @@ class RandomAI(BaseModel):
 
     def choose_piece(self, state: GameState) -> Piece:
         """Choose a random available piece to give to the opponent."""
-        remaining = state.get_remaining_pieces()
-        return random.choice(list(remaining.values()))
+        return random.choice(state.get_remaining_pieces_list())
 
     def choose_position(self, state: GameState, piece: Piece) -> tuple[int, int]:
         """
