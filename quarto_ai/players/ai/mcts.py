@@ -19,11 +19,13 @@ class MCTSNode:
     :param player_who_moved: Player who made the last move (None for the initial root).
     :param unexplored_moves: List of unexplored possible moves.
     """
-    def __init__(self,
-                 parent: "MCTSNode",
-                 move: MoveType,
-                 player_who_moved: Player | None,
-                 unexplored_moves: list[MoveType]) -> None:
+    def __init__(
+            self,
+            parent: "MCTSNode",
+            move: MoveType,
+            player_who_moved: Player | None,
+            unexplored_moves: list[MoveType]
+        ) -> None:
         self.move: MoveType = move
         self.player_who_moved: Player | None = player_who_moved
 
@@ -104,7 +106,11 @@ class MCTS(BaseModel):
     :param exploration_weight: Exploration factor for UCB1.
     """
 
-    def __init__(self, simulations: int, exploration_weight: float, name: str = "MCTS"):
+    def __init__(
+            self, simulations: int = 1_000,
+            exploration_weight: float = 1.414,
+            name: str = "MCTS"
+        ) -> None:
         super().__init__(name)
         self.simulations: int = simulations
         self.exploration_weight: float = exploration_weight

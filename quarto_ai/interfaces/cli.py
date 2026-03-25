@@ -2,11 +2,16 @@ import sys
 from quarto_ai.runners.game_runner import GameRunner
 from quarto_ai.players.human import HumanPlayer
 from quarto_ai.players.ai.random_ai import RandomAI
+from quarto_ai.players.ai.mcts import MCTS
 
+MCTS_SIMULATION = 1_000
 GAME_MODES: dict[int, tuple[str, tuple]] = {
     1: ("Human vs Human", (HumanPlayer("Human 1"), HumanPlayer("Human 2"))),
     2: ("Human vs RandomAI", (HumanPlayer("Human"), RandomAI("RandomAI"))),
-    3: ("RandomAI vs RandomAI", (RandomAI("RandomAI-1"), RandomAI("RandomAI-2"))),
+    3: ("Human vs MCTS", (HumanPlayer("Human"), MCTS(simulations=MCTS_SIMULATION, name="MCTS"))),
+    4: ("RandomAI vs RandomAI", (RandomAI("RandomAI-1"), RandomAI("RandomAI-2"))),
+    5: ("RandomAI vs MCTS", (RandomAI("RandomAI"), MCTS(simulations=MCTS_SIMULATION, name="MCTS"))),
+    6: ("MCTS vs MCTS", (MCTS(simulations=MCTS_SIMULATION, name="MCTS-1"), MCTS(simulations=MCTS_SIMULATION, name="MCTS-2"))),
 }
 
 
