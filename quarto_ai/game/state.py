@@ -1,11 +1,7 @@
-from .piece import Piece, generate_all_pieces
 from .board import Board
-from .types import Player, GamePhase, GameResult
-from .exceptions import (
-    InvalidPieceError,
-    GameEndedError,
-    InvalidPhaseError
-)
+from .exceptions import GameEndedError, InvalidPhaseError, InvalidPieceError
+from .piece import Piece, generate_all_pieces
+from .types import GamePhase, GameResult, Player
 
 
 class GameState:
@@ -87,7 +83,6 @@ class GameState:
     def get_remaining_pieces(self) -> dict[int, Piece]:
         """Returns the list of available pieces."""
         return self.remaining_pieces
-
 
     def __str__(self) -> str:
         """Simple display of the game state."""

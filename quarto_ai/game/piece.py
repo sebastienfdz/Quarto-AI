@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Piece:
+    """Represents a piece in Quarto"""
+
     height: int
     color: int
     shape: int
@@ -19,9 +21,4 @@ class Piece:
 
 def generate_all_pieces() -> list[Piece]:
     """Generates all 16 unique pieces"""
-    return [Piece((i>>3) & 1,
-                  (i>>2) & 1,
-                  (i>>1) & 1,
-                  (i) & 1)
-            for i in range(16)
-    ]
+    return [Piece((i >> 3) & 1, (i >> 2) & 1, (i >> 1) & 1, (i) & 1) for i in range(16)]
