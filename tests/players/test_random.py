@@ -1,4 +1,5 @@
 import pytest
+
 from quarto_ai.game.piece import Piece
 from quarto_ai.game.state import GameState
 from quarto_ai.players.ai.random_ai import RandomAI

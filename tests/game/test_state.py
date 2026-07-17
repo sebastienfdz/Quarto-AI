@@ -1,14 +1,16 @@
 import re
+
 import pytest
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import Player, GamePhase, GameResult
+
 from quarto_ai.game.exceptions import (
     GameEndedError,
-    InvalidSquareError,
+    InvalidPhaseError,
     InvalidPieceError,
-    InvalidPhaseError
+    InvalidSquareError,
 )
+from quarto_ai.game.piece import Piece
+from quarto_ai.game.state import GameState
+from quarto_ai.game.types import GamePhase, GameResult, Player
 
 
 @pytest.fixture
@@ -27,19 +29,19 @@ def new_game() -> GameState:
 def game_draw() -> GameState:
     """Create a draw game of Quarto."""
     ordered_pieces = [
-         0,  2,  1, 15,
-         5,  4,  3, 12,
-        10, 13, 11,  7,
-        14,  8,  6,  9
+        [0, 2, 1, 15],
+        [5, 4, 3, 12],
+        [10, 13, 11, 7],
+        [14, 8, 6, 9],
     ]
     game = GameState()
     pieces = game.get_remaining_pieces_list()
 
-    for i in range(16):
-        x, y = divmod(i, 4)
-        piece = pieces[ordered_pieces[i]]
-        game.select_piece(piece)
-        game.place_piece(x, y)
+    for x in range(4):
+        for y in range(4):
+            piece = pieces[ordered_pieces[x][y]]
+            game.select_piece(piece)
+            game.place_piece(x, y)
 
     assert game.result == GameResult.DRAW
     assert game.board.is_full()
@@ -66,7 +68,7 @@ def test_standard_turn_flow(new_game: GameState):
     # Action 2: Player 2 places the piece
     new_game.place_piece(0, 0)
     assert new_game.current_player == Player.PLAYER_2
-    assert new_game.phase == GamePhase.SELECTION
+    assert new_game.phase == GamePhase.SELECTION  # type: ignore[comparison-overlap]
 
     # Action 3: Player 2 selects the next piece
     piece = new_game.get_remaining_pieces_list()[0]
@@ -93,7 +95,7 @@ def test_select_piece_invalid_phase_raises(new_game: GameState):
     assert new_game.phase == GamePhase.SELECTION
     piece = new_game.get_remaining_pieces_list()[0]
     new_game.select_piece(piece)
-    assert new_game.phase == GamePhase.PLACEMENT
+    assert new_game.phase == GamePhase.PLACEMENT  # type: ignore[comparison-overlap]
 
     with pytest.raises(InvalidPhaseError, match="Invalid phase."):
         new_game.select_piece(new_game.get_remaining_pieces_list()[0])
@@ -231,5 +233,5 @@ def test_full_board_to_str(game_draw: GameState):
     assert printed_player.startswith("Current player: ")
     printed_phase = lines.pop(0)
     assert printed_phase.startswith("Phase: ")
-    for l in lines:
-        assert regex.match(l) is not None
+    for line in lines:
+        assert regex.match(line) is not None
