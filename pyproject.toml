@@ -1,0 +1,42 @@
+[project]
+name = "quarto-ai"
+version = "0.1.0"
+description = "Quarto board game engine with AI implementations"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["numpy>=2.3.2"]
+
+[project.optional-dependencies]
+dev = ["ruff", "mypy", "pytest"]
+
+[tool.ruff]
+# Ruff configuration (Linter & Formatter)
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable specific rule sets
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "N",  # pep8-naming
+    "UP", # pyupgrade
+]
+ignore = []
+
+[tool.mypy]
+# MyPy configuration
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+# Pytest configuration
+testpaths = ["tests"]
+python_files = "test_*.py"
