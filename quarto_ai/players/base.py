@@ -1,6 +1,7 @@
 import abc
-from quarto_ai.game.state import GameState
+
 from quarto_ai.game.piece import Piece
+from quarto_ai.game.state import GameState
 
 
 class BaseModel(abc.ABC):
@@ -9,7 +10,7 @@ class BaseModel(abc.ABC):
     Defines the standard interface every AI must implement.
     """
 
-    def __init__(self, name: str = "BaseModel"):
+    def __init__(self, name: str = "BaseModel") -> None:
         self.name = name
 
     @abc.abstractmethod
@@ -21,7 +22,6 @@ class BaseModel(abc.ABC):
         :param piece: Piece to place
         :return: (row, col) coordinates of the move
         """
-        pass
 
     @abc.abstractmethod
     def choose_piece(self, state: GameState) -> Piece:
@@ -31,4 +31,3 @@ class BaseModel(abc.ABC):
         :param state: Current GameState
         :return: Piece object chosen
         """
-        pass
