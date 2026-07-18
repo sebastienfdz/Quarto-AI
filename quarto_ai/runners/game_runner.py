@@ -1,12 +1,12 @@
-from quarto_ai.players.base import BaseModel
 from quarto_ai.game.state import GameState
 from quarto_ai.game.types import GameResult
+from quarto_ai.players.base import BaseModel
 
 
 class GameRunner:
     """Game engine runner that orchestrates a match between two players."""
 
-    def __init__(self, player0: BaseModel, player1: BaseModel):
+    def __init__(self, player0: BaseModel, player1: BaseModel) -> None:
         self.game = GameState()
         self.players = [player0, player1]
 
@@ -21,6 +21,8 @@ class GameRunner:
     def _play_turn(self) -> None:
         """Executes a single turn of the game."""
         current = self.players[self.game.current_player]
+        if self.game.next_piece is None:
+            raise ValueError("No piece selected to be placed.")
 
         x, y = current.choose_position(self.game, self.game.next_piece)
         self.game.place_piece(x, y)
@@ -28,7 +30,6 @@ class GameRunner:
         if self.game.result is None:
             next_piece = current.choose_piece(self.game)
             self.game.select_piece(next_piece)
-
 
     def run(self) -> None:
         """Main game loop."""

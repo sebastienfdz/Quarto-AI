@@ -1,8 +1,10 @@
 import re
+
 import pytest
+
 from quarto_ai.game.board import Board
-from quarto_ai.game.piece import Piece, generate_all_pieces
 from quarto_ai.game.exceptions import InvalidSquareError
+from quarto_ai.game.piece import Piece, generate_all_pieces
 
 
 @pytest.fixture
@@ -21,7 +23,6 @@ def full_board() -> Board:
         for y in range(4):
             board.place_piece(x, y, pieces.pop())
     return board
-
 
 
 def test_place_piece_valid(empty_board: Board):
@@ -80,12 +81,7 @@ def test_check_victory_true(full_board: Board):
 
 def test_empty_board_to_str(empty_board: Board):
     """The string representation of an empty board should match the expected layout."""
-    printed_board = (
-        ".. | .. | .. | ..\n"
-        ".. | .. | .. | ..\n"
-        ".. | .. | .. | ..\n"
-        ".. | .. | .. | .."
-    )
+    printed_board = ".. | .. | .. | ..\n.. | .. | .. | ..\n.. | .. | .. | ..\n.. | .. | .. | .."
     assert str(empty_board) == printed_board
 
 
@@ -94,5 +90,5 @@ def test_full_board_to_str(full_board: Board):
     regex = re.compile(r"\d\d \| \d\d \| \d\d \| \d\d")
     lines = str(full_board).splitlines()
     assert len(lines) == 4
-    for l in lines:
-        assert regex.match(l) is not None
+    for line in lines:
+        assert regex.match(line) is not None

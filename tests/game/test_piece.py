@@ -1,4 +1,3 @@
-import pytest
 from quarto_ai.game.piece import Piece, generate_all_pieces
 
 

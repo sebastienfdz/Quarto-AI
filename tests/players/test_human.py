@@ -1,4 +1,5 @@
 import pytest
+
 from quarto_ai.game.piece import Piece
 from quarto_ai.game.state import GameState
 from quarto_ai.players.human import HumanPlayer
@@ -28,7 +29,7 @@ def test_choose_position_valid(new_game: GameState):
 def test_choose_position_retry(new_game: GameState):
     """Retry after invalid format input and eventually return a valid position."""
     inputs = iter(["invalid position", "0, 0"])
-    outputs = []
+    outputs: list[str] = []
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
@@ -44,7 +45,7 @@ def test_choose_position_retry(new_game: GameState):
 def test_choose_position_unavailable_square(new_game: GameState):
     """Retry when the chosen position is already occupied."""
     inputs = iter(["0, 0", "1, 1"])
-    outputs = []
+    outputs: list[str] = []
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
@@ -77,7 +78,7 @@ def test_choose_piece_valid(new_game: GameState):
 def test_choose_piece_retry_value_error(new_game: GameState):
     """Retry when the user enters a non-integer piece ID."""
     inputs = iter(["invalid piece", "0"])
-    outputs = []
+    outputs: list[str] = []
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
@@ -91,7 +92,7 @@ def test_choose_piece_retry_value_error(new_game: GameState):
 def test_choose_piece_retry_key_error(new_game: GameState):
     """Retry when the user selects a piece that is not available."""
     inputs = iter(["-100", "0"])
-    outputs = []
+    outputs: list[str] = []
     player = HumanPlayer(
         input_func=lambda _: next(inputs),
         output_func=outputs.append,

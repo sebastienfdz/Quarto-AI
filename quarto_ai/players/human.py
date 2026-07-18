@@ -1,7 +1,8 @@
-from typing import Callable
-from quarto_ai.players.base import BaseModel
-from quarto_ai.game.state import GameState
+from collections.abc import Callable
+
 from quarto_ai.game.piece import Piece
+from quarto_ai.game.state import GameState
+from quarto_ai.players.base import BaseModel
 
 
 class HumanPlayer(BaseModel):
@@ -13,10 +14,11 @@ class HumanPlayer(BaseModel):
     """
 
     def __init__(
-            self,
-            name: str = "Human",
-            input_func: Callable[[str], str] = input,
-            output_func: Callable[[str], None] = print):
+        self,
+        name: str = "Human",
+        input_func: Callable[[str], str] = input,
+        output_func: Callable[[str], None] = print,
+    ) -> None:
         super().__init__(name)
         self.input_func = input_func
         self.output_func = output_func

@@ -1,14 +1,14 @@
 import numpy as np
-from .piece import Piece
+
 from .exceptions import InvalidSquareError
+from .piece import Piece
 
 
 class Board:
-
-    def __init__(self):
+    def __init__(self) -> None:
         self.game_board: np.ndarray = np.full(shape=(4, 4), fill_value=None, dtype=object)
 
-    def place_piece(self, x: int, y: int, piece: Piece):
+    def place_piece(self, x: int, y: int, piece: Piece) -> None:
         """
         Places a piece on the board.
 
@@ -29,13 +29,14 @@ class Board:
         diags = [list(self.game_board.diagonal()), list(np.fliplr(self.game_board).diagonal())]
         return rows + cols + diags
 
-    def has_quarto(self, line: list[Piece]) -> bool:
+    def has_quarto(self, line: list[Piece | None]) -> bool:
         """Checks if a line forms a Quarto (at least 1 common attribute)"""
-        if any(p is None for p in line):
+        pieces = [p for p in line if p is not None]
+        if len(pieces) < len(line):
             return False
 
         for bit in range(4):
-            values = [(p.to_bits() >> bit) & 1 for p in line]
+            values = [(p.to_bits() >> bit) & 1 for p in pieces]
             if all(v == values[0] for v in values):
                 return True
         return False
@@ -43,7 +44,6 @@ class Board:
     def check_victory(self) -> bool:
         """Returns True if a win condition is met, False otherwise"""
         return any(self.has_quarto(line) for line in self.get_lines())
-
 
     def __str__(self) -> str:
         """Simple display of the board."""

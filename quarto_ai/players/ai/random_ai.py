@@ -1,9 +1,10 @@
 import copy
 import random
-from quarto_ai.players.base import BaseModel
+
 from quarto_ai.game.board import Board
-from quarto_ai.game.state import GameState
 from quarto_ai.game.piece import Piece
+from quarto_ai.game.state import GameState
+from quarto_ai.players.base import BaseModel
 
 
 class RandomAI(BaseModel):
@@ -14,7 +15,7 @@ class RandomAI(BaseModel):
     - Chooses a random piece to give to the opponent
     """
 
-    def __init__(self, name: str = "RandomAI"):
+    def __init__(self, name: str = "RandomAI") -> None:
         super().__init__(name)
 
     def choose_piece(self, state: GameState) -> Piece:
@@ -29,7 +30,7 @@ class RandomAI(BaseModel):
         positions = state.get_available_positions()
         board_copy = copy.deepcopy(state.board)
 
-        for (x, y) in positions:
+        for x, y in positions:
             if self._is_winning_move(board_copy, x, y, piece):
                 return (x, y)
         return random.choice(positions)
