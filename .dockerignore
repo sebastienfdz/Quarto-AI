@@ -1,0 +1,36 @@
+# Git
+ci.yml
+.git
+.github/
+.gitignore
+.gitattributes
+*.md
+
+# Docker
+docker-compose.yml
+Dockerfile
+.docker
+.dockerignore
+
+# Python
+**/__pycache__/
+**/.mypy_cache/
+**/.pytest_cache/
+**/.ruff_cache/
+**/*.cache/
+**/*.pyc
+**/*.pyo
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Virtual environment
+.venv/
+.env
+env/
+.vscode/
