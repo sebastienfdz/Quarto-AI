@@ -37,8 +37,9 @@ class GameRunner:
     def run(self) -> None:
         """Main game loop."""
         self.logger.info("=== Quarto Game ===")
-        self.logger.info(f"Player 0: {self.players[0].name}\n"
-        + f"Player 1: {self.players[1].name}\n")
+        self.logger.info(
+            f"Player 0: {self.players[0].name}\n" + f"Player 1: {self.players[1].name}\n"
+        )
 
         next_piece = self.players[0].choose_piece(self.game)
         self.game.select_piece(next_piece)
