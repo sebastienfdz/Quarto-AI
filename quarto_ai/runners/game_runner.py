@@ -1,3 +1,5 @@
+import logging
+
 from quarto_ai.game.state import GameState
 from quarto_ai.game.types import GameResult
 from quarto_ai.players.base import BaseModel
@@ -9,14 +11,15 @@ class GameRunner:
     def __init__(self, player0: BaseModel, player1: BaseModel) -> None:
         self.game = GameState()
         self.players = [player0, player1]
+        self.logger = logging.getLogger("quarto_ai.game_runner")
 
     def _display_board(self) -> None:
-        """Prints the current board and indicates the active player."""
-        print("\n" + str(self.game))
+        """Logs the current board and indicates the active player."""
+        self.logger.info("\n" + str(self.game))
         if self.game.result is None:
             current_idx = self.game.current_player
             current_player = self.players[current_idx].name
-            print(f"{current_player} (Player {current_idx}) to move.\n")
+            self.logger.info(f"{current_player} (Player {current_idx}) to move.\n")
 
     def _play_turn(self) -> None:
         """Executes a single turn of the game."""
@@ -33,8 +36,9 @@ class GameRunner:
 
     def run(self) -> None:
         """Main game loop."""
-        print("=== Quarto Game ===")
-        print(f"Player 0: {self.players[0].name}\n" + f"Player 1: {self.players[1].name}\n")
+        self.logger.info("=== Quarto Game ===")
+        self.logger.info(f"Player 0: {self.players[0].name}\n"
+        + f"Player 1: {self.players[1].name}\n")
 
         next_piece = self.players[0].choose_piece(self.game)
         self.game.select_piece(next_piece)
@@ -45,7 +49,7 @@ class GameRunner:
             self._display_board()
 
         if self.game.result == GameResult.DRAW:
-            print("Draw.")
+            self.logger.info("Draw.")
         else:
             winner = self.game.result
-            print(f"🏆 Player {winner} ({self.players[winner].name}) wins!")
+            self.logger.info(f"🏆 Player {winner} ({self.players[winner].name}) wins!")
