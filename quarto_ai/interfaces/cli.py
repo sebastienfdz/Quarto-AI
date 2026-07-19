@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from quarto_ai.players.ai.mcts import MCTS
@@ -5,6 +6,8 @@ from quarto_ai.players.ai.random_ai import RandomAI
 from quarto_ai.players.base import BaseModel
 from quarto_ai.players.human import HumanPlayer
 from quarto_ai.runners.game_runner import GameRunner
+
+logger = logging.getLogger("quarto_ai.cli")
 
 MCTS_SIMULATION = 1_000
 GAME_MODES: dict[int, tuple[str, tuple[BaseModel, BaseModel]]] = {
@@ -25,24 +28,25 @@ GAME_MODES: dict[int, tuple[str, tuple[BaseModel, BaseModel]]] = {
 
 def display_menu() -> None:
     """Display available game modes."""
-    print("=== Quarto CLI ===")
-    print("Select a game mode:")
+    logger.info("=== Quarto CLI ===")
+    logger.info("Select a game mode:")
     for key, (label, _) in GAME_MODES.items():
-        print(f"{key}. {label}")
+        logger.info(f"{key}. {label}")
 
 
 def main() -> None:
     """CLI entry point for Quarto."""
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     display_menu()
 
     try:
         choice = int(input("Enter your choice: ").strip())
         label, players = GAME_MODES[choice]
     except (ValueError, KeyError):
-        print("Invalid choice. Exiting.")
+        logger.error("Invalid choice. Exiting.")
         sys.exit(1)
 
-    print(f"Starting game: {label}\n")
+    logger.info(f"Starting game: {label}\n")
     runner = GameRunner(*players)
     runner.run()
 
