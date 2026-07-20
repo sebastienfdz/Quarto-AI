@@ -143,9 +143,7 @@ class TournamentRunner:
                 for task in tasks:
                     p0, _ = task
                     is_p0_win, is_p1_win, is_draw = _run_single_game_worker(task)
-                    self._record_game_outcome(
-                        results, p0, player_a, is_p0_win, is_p1_win, is_draw
-                    )
+                    self._record_game_outcome(results, p0, player_a, is_p0_win, is_p1_win, is_draw)
                     pbar.update(1)
 
         engine_logger.setLevel(original_level)
