@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Quarto board game engine with AI implementations"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["numpy>=2.3.2"]
+dependencies = ["numpy>=2.3.2", "tqdm>=4.67.2"]
 
 [project.optional-dependencies]
 dev = ["ruff", "mypy", "pytest"]
