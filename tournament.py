@@ -13,6 +13,7 @@ def _handle_matchup_menu(runner: TournamentRunner) -> None:
     try:
         sims = int(input("Enter MCTS simulations (default: 100): ").strip() or "100")
         games = int(input("Enter games per side (default: 50): ").strip() or "50")
+        use_parallel = input("Use parallel processing? (Y/n): ").strip().lower() != "n"
     except ValueError:
         logger.error("Invalid inputs. Exiting.")
         sys.exit(1)
@@ -21,7 +22,7 @@ def _handle_matchup_menu(runner: TournamentRunner) -> None:
     p1 = RandomAI("RandomAI")
     p2 = MCTS(simulations=sims, name=f"MCTS-{sims}")
 
-    results = runner.run_matchup(p1, p2, games)
+    results = runner.run_matchup(p1, p2, games, parallel=use_parallel)
     runner.print_matchup_report(results)
 
 
@@ -29,6 +30,7 @@ def _handle_championship_menu(runner: TournamentRunner) -> None:
     """Handles user input and execution for the Round-Robin championship mode."""
     try:
         games = int(input("Enter games per matchup side (default: 10): ").strip() or "10")
+        use_parallel = input("Use parallel processing? (Y/n): ").strip().lower() != "n"
     except ValueError:
         logger.error("Invalid input. Exiting.")
         sys.exit(1)
@@ -39,7 +41,7 @@ def _handle_championship_menu(runner: TournamentRunner) -> None:
     p3 = MCTS(simulations=1000, name="MCTS-1000")
     players = [p1, p2, p3]
 
-    leaderboard = runner.run_championship(players, games)
+    leaderboard = runner.run_championship(players, games, parallel=use_parallel)
     runner.print_championship_report(leaderboard)
 
 
