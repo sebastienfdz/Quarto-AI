@@ -2,7 +2,7 @@ import itertools
 import logging
 from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Any
+from typing import TypedDict
 
 from tqdm import tqdm
 
@@ -11,6 +11,27 @@ from quarto_ai.players.base import BaseModel
 from quarto_ai.runners.game_runner import GameRunner
 
 logger = logging.getLogger("quarto_ai.tournament")
+
+
+class MatchupResult(TypedDict):
+    player_a_name: str
+    player_b_name: str
+    games_per_side: int
+    total_games: int
+    a_wins: int
+    b_wins: int
+    draws: int
+    starter_wins: int
+    follower_wins: int
+
+
+class LeaderboardEntry(TypedDict):
+    player: BaseModel
+    points: int
+    wins: int
+    draws: int
+    losses: int
+    total_games: int
 
 
 def _run_single_game_worker(args: tuple[BaseModel, BaseModel]) -> tuple[bool, bool, bool]:
@@ -37,7 +58,7 @@ class TournamentRunner:
 
     def _record_game_outcome(
         self,
-        results: dict[str, Any],
+        results: MatchupResult,
         p0: BaseModel,
         player_a: BaseModel,
         is_p0_win: bool,
@@ -67,7 +88,7 @@ class TournamentRunner:
         games_per_side: int,
         max_workers: int | None = None,
         parallel: bool = True,
-    ) -> dict[str, Any]:
+    ) -> MatchupResult:
         """
         Runs a series of games between two players.
         Each player gets to start (Player 0) exactly games_per_side times.
@@ -84,7 +105,7 @@ class TournamentRunner:
 
         tasks = [(player_a, player_b)] * games_per_side + [(player_b, player_a)] * games_per_side
 
-        results: dict[str, Any] = {
+        results: MatchupResult = {
             "player_a_name": player_a.name,
             "player_b_name": player_b.name,
             "games_per_side": games_per_side,
@@ -132,10 +153,10 @@ class TournamentRunner:
 
     def _update_leaderboard_stats(
         self,
-        leaderboard: dict[str, dict[str, Any]],
+        leaderboard: dict[str, LeaderboardEntry],
         player_a: BaseModel,
         player_b: BaseModel,
-        results: dict[str, Any],
+        results: MatchupResult,
     ) -> None:
         """Helper to update championship stats for a pair of players after a matchup."""
         a_name, b_name = player_a.name, player_b.name
@@ -162,7 +183,7 @@ class TournamentRunner:
         games_per_matchup: int,
         max_workers: int | None = None,
         parallel: bool = True,
-    ) -> list[dict[str, Any]]:
+    ) -> list[LeaderboardEntry]:
         """
         Runs a round-robin tournament where every player plays every other player once.
         Each pair matchup runs games_per_matchup per side.
@@ -176,7 +197,7 @@ class TournamentRunner:
         if len(players) < 2:
             raise ValueError("Championship requires at least 2 players.")
 
-        leaderboard: dict[str, dict[str, Any]] = {
+        leaderboard: dict[str, LeaderboardEntry] = {
             p.name: {
                 "player": p,
                 "points": 0,
@@ -199,7 +220,7 @@ class TournamentRunner:
         )
         return sorted_leaderboard
 
-    def print_matchup_report(self, results: dict[str, Any]) -> None:
+    def print_matchup_report(self, results: MatchupResult) -> None:
         """Logs a formatted summary of a 1v1 matchup."""
         total = results["total_games"]
         a_pct = (results["a_wins"] / total) * 100 if total > 0 else 0
@@ -223,7 +244,7 @@ class TournamentRunner:
         logger.info(f"Draws:                     {results['draws']} ({draw_pct:.1f}%)")
         logger.info("=" * 50 + "\n")
 
-    def print_championship_report(self, leaderboard: list[dict[str, Any]]) -> None:
+    def print_championship_report(self, leaderboard: list[LeaderboardEntry]) -> None:
         """Logs a formatted leaderboard table for a championship."""
         logger.info("\n" + "=" * 70)
         logger.info("CHAMPIONSHIP LEADERBOARD")
