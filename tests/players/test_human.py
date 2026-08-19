@@ -19,7 +19,7 @@ def test_choose_position_valid(new_game: GameState):
         input_func=lambda _: next(inputs),
         output_func=lambda _: None,
     )
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
 
     x, y = player.choose_position(new_game, piece)
@@ -34,7 +34,7 @@ def test_choose_position_retry(new_game: GameState):
         input_func=lambda _: next(inputs),
         output_func=outputs.append,
     )
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
 
     x, y = player.choose_position(new_game, piece)
@@ -51,10 +51,10 @@ def test_choose_position_unavailable_square(new_game: GameState):
         output_func=outputs.append,
     )
 
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     new_game.place_piece(0, 0)
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
 
     # The player tries squares "0, 0" (occupied), then "1, 1" (available)

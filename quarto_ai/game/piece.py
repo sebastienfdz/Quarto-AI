@@ -15,7 +15,7 @@ class Piece:
         return (self.height << 3) | (self.color << 2) | (self.shape << 1) | self.fill
 
     def __str__(self) -> str:
-        """Returns piece number (1 to 15)"""
+        """Returns piece number (0 to 15)"""
         return f"{self.to_bits():02d}"
 
 

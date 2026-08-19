@@ -21,7 +21,7 @@ def new_game() -> GameState:
 def game_with_selected_piece() -> GameState:
     """Create a new game of Quarto. Synchronized with `new_mcts_node` (Phase = PLACEMENT)."""
     game = GameState()
-    piece = game.get_remaining_pieces_list()[0]
+    piece = game.get_remaining_pieces()[0]
     game.select_piece(piece)
     return game
 
@@ -50,7 +50,7 @@ def root_node(new_game: GameState) -> MCTSNode:
     A root node with a visit to allow children UCB1 calculation.
     Synchronized with `new_game` (Phase = SELECTION).
     """
-    pieces: list[MoveType] = list(new_game.get_remaining_pieces_list())
+    pieces: list[MoveType] = list(new_game.get_remaining_pieces())
     node = MCTSNode(parent=None, move=None, player_who_moved=None, unexplored_moves=pieces)
     node.visits = 1
     return node
@@ -103,7 +103,7 @@ def expanded_mcts_node(root_node: MCTSNode, game_with_selected_piece: GameState)
 @pytest.fixture
 def terminal_mcts_node(root_node: MCTSNode, new_game) -> MCTSNode:
     """A terminal MCTS Node: a node in a finished state and without any unexplored moves."""
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     node = MCTSNode(
         parent=root_node, move=piece, player_who_moved=Player.PLAYER_1, unexplored_moves=[]
     )
@@ -180,7 +180,7 @@ def test_best_child_play(expanded_mcts_node):
 def test_choose_piece_valid(new_game: GameState, new_mcts: MCTS):
     """The AI should select a valid available piece from the pool."""
     piece = new_mcts.choose_piece(new_game)
-    assert piece in new_game.get_remaining_pieces_list()
+    assert piece in new_game.get_remaining_pieces()
 
 
 def test_choose_piece_not_winning(winning_game: GameState, new_mcts: MCTS):
@@ -188,23 +188,23 @@ def test_choose_piece_not_winning(winning_game: GameState, new_mcts: MCTS):
     In a situation where the opponent could win, the AI
     must not choose the piece that completes the Quarto.
     """
-    loosing_piece = winning_game.get_remaining_pieces_list()[0]
+    loosing_piece = winning_game.get_remaining_pieces()[0]
     chosen_piece = new_mcts.choose_piece(winning_game)
     assert chosen_piece != loosing_piece
 
 
 def test_choose_position_valid(new_game: GameState, new_mcts: MCTS):
     """The AI should select an valid empty square on the board."""
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
 
     x, y = new_mcts.choose_position(new_game, piece)
-    assert (x, y) in new_game.get_available_positions()
+    assert (x, y) in new_game.board.get_available_positions()
 
 
 def test_choose_position_winning(winning_game: GameState, new_mcts: MCTS):
     """The AI must select the winning square when handed a winning piece."""
-    winning_piece = winning_game.get_remaining_pieces_list()[0]
+    winning_piece = winning_game.get_remaining_pieces()[0]
     winning_game.select_piece(winning_piece)
 
     x, y = new_mcts.choose_position(winning_game, winning_piece)
@@ -228,7 +228,7 @@ def test_select_clones_game_states(
     Selection must deep copy the GameState, apply moves along the path,
     and return a non-fully expanded node.
     """
-    leaf_move = game_with_selected_piece.get_remaining_pieces_list()[0]
+    leaf_move = game_with_selected_piece.get_remaining_pieces()[0]
     leaf_node = MCTSNode(
         parent=expanded_mcts_node.children[0],
         move=leaf_move,
@@ -241,7 +241,7 @@ def test_select_clones_game_states(
 
     assert not selected_node.is_fully_expanded() or not selected_node.children
     assert selected_node == leaf_node
-    assert leaf_move not in selected_game.get_remaining_pieces_list()
+    assert leaf_move not in selected_game.get_remaining_pieces()
 
 
 def test_expand(game_with_selected_piece: GameState, new_mcts: MCTS, new_mcts_node: MCTSNode):
@@ -293,7 +293,7 @@ def test_backpropagate(new_mcts: MCTS, new_game: GameState):
     Backpropagation should increment the visit count of all nodes
     in the path from the expanded node up to the root.
     """
-    pieces = new_game.get_remaining_pieces_list()
+    pieces = new_game.get_remaining_pieces()
 
     root = MCTSNode(parent=None, move=None, player_who_moved=None, unexplored_moves=[])
     child1 = MCTSNode(
@@ -333,7 +333,7 @@ def test_backpropagate_credit_assignement(new_mcts: MCTS, new_game: GameState):
     A win for Player X should only increase the win count of
     nodes where the player_who_moved was Player X..
     """
-    pieces = new_game.get_remaining_pieces_list()
+    pieces = new_game.get_remaining_pieces()
 
     root = MCTSNode(parent=None, move=None, player_who_moved=None, unexplored_moves=[])
     child1 = MCTSNode(

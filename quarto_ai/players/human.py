@@ -31,7 +31,7 @@ class HumanPlayer(BaseModel):
             raw = self.input_func(prompt)
             try:
                 x, y = self._parse_position(raw)
-                if (x, y) in state.get_available_positions():
+                if (x, y) in state.board.get_available_positions():
                     return x, y
                 self.output_func("❌ Position unavailable. Try again.")
             except ValueError:
@@ -39,7 +39,7 @@ class HumanPlayer(BaseModel):
 
     def choose_piece(self, state: GameState) -> Piece:
         """Ask the user to select a piece for the opponent."""
-        remaining = state.get_remaining_pieces()
+        remaining = state.remaining_pieces
 
         self.output_func("Available pieces:")
         self.output_func(" ".join(f"{piece_id:02d}" for piece_id in remaining.keys()))
