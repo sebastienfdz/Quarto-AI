@@ -22,6 +22,15 @@ class Board:
         """Checks if the board is full"""
         return all(cell is not None for row in self.game_board for cell in row)
 
+    def get_available_positions(self) -> list[tuple[int, int]]:
+        """Returns the list of available squares on the board."""
+        positions = []
+        for i in range(4):
+            for j in range(4):
+                if self.game_board[i, j] is None:
+                    positions.append((i, j))
+        return positions
+
     def get_lines(self) -> list[list[Piece | None]]:
         """Returns all rows, columns, and diagonals."""
         rows = [list(self.game_board[i, :]) for i in range(4)]

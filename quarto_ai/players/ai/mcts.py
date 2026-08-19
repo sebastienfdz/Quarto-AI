@@ -123,7 +123,8 @@ class MCTS(BaseModel):
         """
         best_node = self._mcts_loop(state)
         piece = best_node.move
-        assert isinstance(piece, Piece)
+        if not isinstance(piece, Piece):
+            raise TypeError(f"Expected Piece, got {type(piece).__name__}")
         return piece
 
     def choose_position(self, state: GameState, piece: Piece) -> tuple[int, int]:
@@ -136,7 +137,8 @@ class MCTS(BaseModel):
         """
         best_node = self._mcts_loop(state)
         position = best_node.move
-        assert isinstance(position, tuple)
+        if not isinstance(position, tuple):
+            raise TypeError(f"Expected tuple, got {type(position).__name__}")
         return position
 
     def _mcts_loop(self, game: GameState) -> MCTSNode:
@@ -247,9 +249,9 @@ class MCTS(BaseModel):
         moves: list[MoveType] = []
 
         if game.phase == GamePhase.PLACEMENT:
-            moves = list(game.get_available_positions())
+            moves = list(game.board.get_available_positions())
         elif game.phase == GamePhase.SELECTION:
-            moves = list(game.get_remaining_pieces_list())
+            moves = list(game.get_remaining_pieces())
         return moves
 
     def _apply_move(self, game: GameState, move: MoveType) -> None:
@@ -260,8 +262,10 @@ class MCTS(BaseModel):
         :param move: Move to apply to the current game state.
         """
         if game.phase == GamePhase.PLACEMENT:
-            assert isinstance(move, tuple)
+            if not isinstance(move, tuple):
+                raise TypeError(f"Expected tuple for placement, got {type(move).__name__}")
             game.place_piece(move[0], move[1])
         elif game.phase == GamePhase.SELECTION:
-            assert isinstance(move, Piece)
+            if not isinstance(move, Piece):
+                raise TypeError(f"Expected Piece for selection, got {type(move).__name__}")
             game.select_piece(move)

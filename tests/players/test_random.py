@@ -33,22 +33,22 @@ def test_choose_piece_valid(new_game: GameState):
     """Return a piece that is still available in the game state."""
     player = RandomAI()
     piece = player.choose_piece(new_game)
-    assert piece in new_game.get_remaining_pieces_list()
+    assert piece in new_game.get_remaining_pieces()
 
 
 def test_choose_position_valid(new_game: GameState):
     """Return a valid and currently available board position."""
     player = RandomAI()
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     x, y = player.choose_position(new_game, piece)
-    assert (x, y) in new_game.get_available_positions()
+    assert (x, y) in new_game.board.get_available_positions()
 
 
 def test_choose_position_winning(winning_game: GameState):
     """Select the winning move when one is immediately available."""
     player = RandomAI()
-    piece = winning_game.get_remaining_pieces_list()[0]
+    piece = winning_game.get_remaining_pieces()[0]
     winning_game.select_piece(piece)
 
     x, y = player.choose_position(winning_game, piece)

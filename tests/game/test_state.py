@@ -35,7 +35,7 @@ def game_draw() -> GameState:
         [14, 8, 6, 9],
     ]
     game = GameState()
-    pieces = game.get_remaining_pieces_list()
+    pieces = game.get_remaining_pieces()
 
     for x in range(4):
         for y in range(4):
@@ -59,7 +59,7 @@ def test_initial_state(new_game: GameState):
 def test_standard_turn_flow(new_game: GameState):
     """Test the state machine transitions (Selection -> Placement -> Selection)."""
     # Action 1: Player 1 selects a piece
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     assert new_game.current_player == Player.PLAYER_2
     assert new_game.phase == GamePhase.PLACEMENT
@@ -71,7 +71,7 @@ def test_standard_turn_flow(new_game: GameState):
     assert new_game.phase == GamePhase.SELECTION  # type: ignore[comparison-overlap]
 
     # Action 3: Player 2 selects the next piece
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     assert new_game.current_player == Player.PLAYER_1
     assert new_game.phase == GamePhase.PLACEMENT
@@ -80,7 +80,7 @@ def test_standard_turn_flow(new_game: GameState):
 
 def test_game_victory(new_game: GameState):
     """Create a game of Quarto with a winner."""
-    pieces = new_game.get_remaining_pieces_list()
+    pieces = new_game.get_remaining_pieces()
     for i in range(4):
         new_game.select_piece(pieces[i])
         new_game.place_piece(i, 0)
@@ -93,12 +93,12 @@ def test_game_victory(new_game: GameState):
 def test_select_piece_invalid_phase_raises(new_game: GameState):
     """Calling select_piece during PLACEMENT phase should raise InvalidPhaseError."""
     assert new_game.phase == GamePhase.SELECTION
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     assert new_game.phase == GamePhase.PLACEMENT  # type: ignore[comparison-overlap]
 
     with pytest.raises(InvalidPhaseError, match="Invalid phase."):
-        new_game.select_piece(new_game.get_remaining_pieces_list()[0])
+        new_game.select_piece(new_game.get_remaining_pieces()[0])
 
 
 def test_place_piece_invalid_phase_raises(new_game: GameState):
@@ -122,7 +122,7 @@ def test_place_piece_game_ended_raises(game_draw: GameState):
 
 def test_select_piece_invalid_piece_raises(new_game: GameState):
     """Selecting an already used piece should raise InvalidPieceError."""
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     new_game.place_piece(0, 0)
 
@@ -132,7 +132,7 @@ def test_select_piece_invalid_piece_raises(new_game: GameState):
 
 def test_place_piece_invalid_square_raises(new_game: GameState):
     """Playing on an occupied square should raise InvalidSquareError."""
-    pieces = new_game.get_remaining_pieces_list()
+    pieces = new_game.get_remaining_pieces()
     new_game.select_piece(pieces[0])
     new_game.place_piece(0, 0)
 
@@ -146,7 +146,7 @@ def test_play_move_winning(new_game: GameState):
     Playing a winning move should make a victory,
     trying to play again should raise GameEndedError.
     """
-    pieces = new_game.get_remaining_pieces_list()
+    pieces = new_game.get_remaining_pieces()
     for i in range(4):
         new_game.select_piece(pieces[i])
         new_game.place_piece(0, i)
@@ -159,36 +159,22 @@ def test_play_move_winning(new_game: GameState):
 
 def test_get_available_positions_empty(new_game: GameState):
     """A new game should have 16 unique available positions."""
-    pos = new_game.get_available_positions()
+    pos = new_game.board.get_available_positions()
     assert len(pos) == 16
     assert len(pos) == len(set(pos))
 
 
 def test_get_available_positions_full(game_draw: GameState):
     """A full game should have no available positions."""
-    assert len(game_draw.get_available_positions()) == 0
+    assert len(game_draw.board.get_available_positions()) == 0
 
 
 def test_get_available_positions_one_move(new_game: GameState):
     """After one placement, 15 available positions should remain."""
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     new_game.place_piece(0, 0)
-    assert len(new_game.get_available_positions()) == 15
-
-
-def test_get_remaining_pieces_list_new_game(new_game: GameState):
-    """A new game should have 16 unique remaining pieces."""
-    pieces = new_game.get_remaining_pieces_list()
-    assert len(pieces) == 16
-    assert len(pieces) == len(set(pieces))
-
-
-def test_get_remaining_pieces_list_one_selection(new_game: GameState):
-    """After one selection, 15 available pieces should remain."""
-    piece = new_game.get_remaining_pieces_list()[0]
-    new_game.select_piece(piece)
-    assert len(new_game.get_remaining_pieces_list()) == 15
+    assert len(new_game.board.get_available_positions()) == 15
 
 
 def test_get_remaining_pieces_new_game(new_game: GameState):
@@ -200,14 +186,14 @@ def test_get_remaining_pieces_new_game(new_game: GameState):
 
 def test_get_remaining_pieces_one_selection(new_game: GameState):
     """After one selection, 15 available pieces should remain."""
-    piece = new_game.get_remaining_pieces_list()[0]
+    piece = new_game.get_remaining_pieces()[0]
     new_game.select_piece(piece)
     assert len(new_game.get_remaining_pieces()) == 15
 
 
 def test_get_remaining_pieces_full(game_draw: GameState):
     """A full game should have no remaining pieces."""
-    assert len(game_draw.get_remaining_pieces_list()) == 0
+    assert len(game_draw.get_remaining_pieces()) == 0
 
 
 def test_new_game_to_str(new_game: GameState):

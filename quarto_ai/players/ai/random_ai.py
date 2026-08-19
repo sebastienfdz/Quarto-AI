@@ -20,14 +20,14 @@ class RandomAI(BaseModel):
 
     def choose_piece(self, state: GameState) -> Piece:
         """Choose a random available piece to give to the opponent."""
-        return random.choice(state.get_remaining_pieces_list())
+        return random.choice(state.get_remaining_pieces())
 
     def choose_position(self, state: GameState, piece: Piece) -> tuple[int, int]:
         """
         Choose where to place the given piece.
         If possible choose a winning move, if not choose a random position.
         """
-        positions = state.get_available_positions()
+        positions = state.board.get_available_positions()
         board_copy = copy.deepcopy(state.board)
 
         for x, y in positions:

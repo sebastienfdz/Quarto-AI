@@ -36,7 +36,7 @@ class GameState:
             raise InvalidPhaseError("Invalid phase.")
         if self.next_piece is not None:
             raise InvalidPieceError("Next piece was already chosen.")
-        if piece not in self.get_remaining_pieces_list():
+        if piece not in self.get_remaining_pieces():
             raise InvalidPieceError("Piece already played.")
 
         self.next_piece = piece
@@ -67,22 +67,9 @@ class GameState:
         self.phase = self.phase.change_phase
         self._update_state()
 
-    def get_available_positions(self) -> list[tuple[int, int]]:
-        """Returns the list of available squares."""
-        positions = []
-        for i in range(4):
-            for j in range(4):
-                if self.board.game_board[i, j] is None:
-                    positions.append((i, j))
-        return positions
-
-    def get_remaining_pieces_list(self) -> list[Piece]:
+    def get_remaining_pieces(self) -> list[Piece]:
         """Returns the list of available pieces."""
         return list(self.remaining_pieces.values())
-
-    def get_remaining_pieces(self) -> dict[int, Piece]:
-        """Returns the list of available pieces."""
-        return self.remaining_pieces
 
     def __str__(self) -> str:
         """Simple display of the game state."""
