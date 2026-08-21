@@ -71,6 +71,26 @@ class GameState:
         """Returns the list of available pieces."""
         return list(self.remaining_pieces.values())
 
+    def clone(self) -> "GameState":
+        """
+        Creates a fast copy of the game state for tree search algorithms.
+
+        Bypasses the overhead of copy.deepcopy() by manually duplicating only
+        the mutable containers.
+        """
+        new_state = GameState.__new__(GameState)
+
+        new_state.board = Board.__new__(Board)
+        new_state.board.game_board = self.board.game_board.copy()
+
+        new_state.remaining_pieces = self.remaining_pieces.copy()
+        new_state.current_player = self.current_player
+        new_state.phase = self.phase
+        new_state.next_piece = self.next_piece
+        new_state.result = self.result
+
+        return new_state
+
     def __str__(self) -> str:
         """Simple display of the game state."""
         text = f"Current player: {self.current_player}\n"
