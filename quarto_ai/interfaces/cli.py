@@ -2,6 +2,8 @@ import logging
 import sys
 
 from quarto_ai.players.ai.mcts import MCTS
+from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
+from quarto_ai.players.ai.minimax.minimax import Minimax
 from quarto_ai.players.ai.random_ai import RandomAI
 from quarto_ai.players.base import BaseModel
 from quarto_ai.players.human import HumanPlayer
@@ -14,13 +16,40 @@ GAME_MODES: dict[int, tuple[str, tuple[BaseModel, BaseModel]]] = {
     1: ("Human vs Human", (HumanPlayer("Human 1"), HumanPlayer("Human 2"))),
     2: ("Human vs RandomAI", (HumanPlayer("Human"), RandomAI("RandomAI"))),
     3: ("Human vs MCTS", (HumanPlayer("Human"), MCTS(simulations=MCTS_SIMULATION, name="MCTS"))),
-    4: ("RandomAI vs RandomAI", (RandomAI("RandomAI-1"), RandomAI("RandomAI-2"))),
+    4: (
+        "Human vs Minimax",
+        (
+            HumanPlayer("Human"),
+            Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax"),
+        ),
+    ),
     5: ("RandomAI vs MCTS", (RandomAI("RandomAI"), MCTS(simulations=MCTS_SIMULATION, name="MCTS"))),
     6: (
-        "MCTS vs MCTS",
+        "RandomAI vs Minimax",
         (
-            MCTS(simulations=MCTS_SIMULATION, name="MCTS-1"),
-            MCTS(simulations=MCTS_SIMULATION, name="MCTS-2"),
+            RandomAI("RandomAI"),
+            Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax"),
+        ),
+    ),
+    7: (
+        "MCTS-100 vs MCTS-1000",
+        (
+            MCTS(simulations=100, name="MCTS-100"),
+            MCTS(simulations=1000, name="MCTS-1000"),
+        ),
+    ),
+    8: (
+        "MCTS vs Minimax",
+        (
+            MCTS(simulations=MCTS_SIMULATION, name="MCTS"),
+            Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax"),
+        ),
+    ),
+    9: (
+        "Minimax-d2 vs Minimax-d3",
+        (
+            Minimax(evaluator=SimpleEvaluator(), depth=2, use_alpha_beta=False, name="Minimax-d2"),
+            Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax-d3"),
         ),
     ),
 }
