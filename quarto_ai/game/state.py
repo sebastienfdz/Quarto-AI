@@ -3,6 +3,8 @@ from .exceptions import GameEndedError, InvalidPhaseError, InvalidPieceError
 from .piece import Piece, generate_all_pieces
 from .types import GamePhase, GameResult, Player
 
+MoveType = tuple[int, int] | Piece | None
+
 
 class GameState:
     """Complete game state of a game of Quarto."""
@@ -90,6 +92,31 @@ class GameState:
         new_state.result = self.result
 
         return new_state
+
+    def get_legal_moves(self) -> list[MoveType]:
+        """Find every legal moves from a game state position."""
+        moves: list[MoveType] = []
+
+        if self.phase == GamePhase.PLACEMENT:
+            moves = list(self.board.get_available_positions())
+        elif self.phase == GamePhase.SELECTION:
+            moves = list(self.get_remaining_pieces())
+        return moves
+
+    def apply_move(self, move: MoveType) -> None:
+        """
+        Apply a single move to the given game state.
+
+        :param move: Move to apply to the current game state.
+        """
+        if self.phase == GamePhase.PLACEMENT:
+            if not isinstance(move, tuple):
+                raise TypeError(f"Expected tuple for placement, got {type(move).__name__}")
+            self.place_piece(move[0], move[1])
+        elif self.phase == GamePhase.SELECTION:
+            if not isinstance(move, Piece):
+                raise TypeError(f"Expected Piece for selection, got {type(move).__name__}")
+            self.select_piece(move)
 
     def __str__(self) -> str:
         """Simple display of the game state."""
