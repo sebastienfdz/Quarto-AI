@@ -37,7 +37,7 @@ class BaseEvaluator(abc.ABC):
     """
     Abstract base class for Minimax position evaluators.
 
-    Follows the Strategy pattern: a MinimaxPlayer accepts any BaseEvaluator,
+    Follows the Strategy pattern: a Minimax accepts any BaseEvaluator,
     enabling benchmarking of different evaluation functions against each other.
     """
 
@@ -63,6 +63,7 @@ class SimpleEvaluator(BaseEvaluator):
     Scores a board by summing weighted threat levels across all lines.
     Only 2-piece and 3-piece alive lines contribute to the score.
     """
+
     _THREE_THREAT_WEIGHT: ClassVar[float] = 5.0
     _TWO_THREAT_WEIGHT: ClassVar[float] = 1.0
 
