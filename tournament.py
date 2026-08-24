@@ -1,83 +1,124 @@
 import logging
 import sys
+from collections.abc import Callable
 
 from quarto_ai.players.ai.mcts import MCTS
 from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
 from quarto_ai.players.ai.minimax.minimax import Minimax
 from quarto_ai.players.ai.random_ai import RandomAI
+from quarto_ai.players.base import BaseModel
 from quarto_ai.runners.tournament_runner import TournamentRunner
 
 logger = logging.getLogger("quarto_ai.tournament")
 
 
-def _handle_matchup_menu(runner: TournamentRunner) -> None:
-    """Handles user input and execution for the 1v1 matchup mode."""
+AGENTS: dict[str, BaseModel] = {
+    "RandomAI": RandomAI("RandomAI"),
+    "MCTS-100": MCTS(simulations=100, name="MCTS-100"),
+    "MCTS-1000": MCTS(simulations=1000, name="MCTS-1000"),
+    "Minimax-d2": Minimax(
+        evaluator=SimpleEvaluator(), depth=2, use_alpha_beta=False, name="Minimax-d2"
+    ),
+    "Minimax-d3": Minimax(
+        evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax-d3"
+    ),
+    "Minimax-d3-AB": Minimax(
+        evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=True, name="Minimax-d3-AB"
+    ),
+    "Minimax-d4-AB": Minimax(
+        evaluator=SimpleEvaluator(), depth=4, use_alpha_beta=True, name="Minimax-d4-AB"
+    ),
+}
+
+TOURNAMENT_MODES: dict[int, str] = {
+    1: "1v1 Matchup",
+    2: f"Championship ({' vs '.join(AGENTS.keys())})",
+    3: "Exit",
+}
+
+
+def display_menu() -> None:
+    """Display available tournament modes."""
+    logger.info("=== Quarto Tournament CLI ===")
+    logger.info("Select a mode:")
+    for key, label in TOURNAMENT_MODES.items():
+        logger.info(f"{key}. {label}")
+
+
+def _prompt_settings() -> tuple[int, bool]:
+    """Prompt the user for games per side and parallel processing."""
     try:
-        sims = int(input("Enter MCTS simulations (default: 100): ").strip() or "100")
-        games = int(input("Enter games per side (default: 50): ").strip() or "50")
-        use_parallel = input("Use parallel processing? (Y/n): ").strip().lower() != "n"
-    except ValueError:
-        logger.error("Invalid inputs. Exiting.")
-        sys.exit(1)
-
-    logger.info("\nStarting matchup...")
-    p1 = RandomAI("RandomAI")
-    p2 = MCTS(simulations=sims, name=f"MCTS-{sims}")
-
-    results = runner.run_matchup(p1, p2, games, parallel=use_parallel)
-    runner.print_matchup_report(results)
-
-
-def _handle_championship_menu(runner: TournamentRunner) -> None:
-    """Handles user input and execution for the Round-Robin championship mode."""
-    try:
-        games = int(input("Enter games per matchup side (default: 10): ").strip() or "10")
+        games = int(input("Games per matchup side (default: 10): ").strip() or "10")
         use_parallel = input("Use parallel processing? (Y/n): ").strip().lower() != "n"
     except ValueError:
         logger.error("Invalid input. Exiting.")
         sys.exit(1)
+    return games, use_parallel
 
-    logger.info("\nStarting championship...")
-    p1 = RandomAI("RandomAI")
-    p2 = MCTS(simulations=100, name="MCTS-100")
-    p3 = MCTS(simulations=1000, name="MCTS-1000")
-    p4 = Minimax(evaluator=SimpleEvaluator(), depth=2, use_alpha_beta=False, name="Minimax-d2")
-    p5 = Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax-d3")
-    p6 = Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=True, name="Minimax-d3-AB")
-    players = [p1, p2, p3, p4, p5, p6]
 
+def _run_matchup() -> None:
+    """Run a 1v1 matchup between two chosen agents."""
+    agent_list = list(AGENTS.keys())
+    logger.info("\nAvailable agents:")
+    for i, name in enumerate(agent_list, start=1):
+        logger.info(f"  {i}. {name}")
+
+    try:
+        a = int(input("Select agent 1 (number): ").strip()) - 1
+        b = int(input("Select agent 2 (number): ").strip()) - 1
+        player_a = AGENTS[agent_list[a]]
+        player_b = AGENTS[agent_list[b]]
+    except (ValueError, IndexError):
+        logger.error("Invalid selection. Exiting.")
+        sys.exit(1)
+
+    games, use_parallel = _prompt_settings()
+    runner = TournamentRunner()
+
+    logger.info(f"\nStarting 1v1: {player_a.name} vs {player_b.name}...")
+    result = runner.run_matchup(player_a, player_b, games, parallel=use_parallel)
+    runner.print_matchup_report(result)
+
+
+def _run_championship() -> None:
+    """Run a round-robin championship across all registered agents."""
+    games, use_parallel = _prompt_settings()
+
+    players = list(AGENTS.values())
+    runner = TournamentRunner()
+
+    logger.info("\nStarting Championship...")
     leaderboard = runner.run_championship(players, games, parallel=use_parallel)
     runner.print_championship_report(leaderboard)
 
 
-def main() -> None:
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
-    logging.getLogger("quarto_ai.tournament").setLevel(logging.INFO)
+def _run_exit() -> None:
+    """Exit the tournament CLI."""
+    logger.info("Exiting.")
+    sys.exit(0)
 
-    logger.info("=== Quarto Tournament CLI ===")
-    logger.info("Select an option:")
-    logger.info("1. 1v1 Matchup (RandomAI vs MCTS)")
-    logger.info(
-        "2. Championship (RandomAI vs MCTS-100 vs MCTS-1000 vs "
-        "Minimax-d2 vs Minimax-d3 vs Minimax-d3-AB)"
-    )
-    logger.info("3. Exit")
+
+HANDLERS: dict[int, Callable[[], None]] = {
+    1: _run_matchup,
+    2: _run_championship,
+    3: _run_exit,
+}
+
+
+def main() -> None:
+    """CLI entry point for the Quarto tournament runner."""
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    display_menu()
 
     try:
         choice = int(input("Enter choice: ").strip())
-    except (ValueError, IndexError):
+        if choice not in HANDLERS:
+            raise ValueError
+    except ValueError:
         logger.error("Invalid choice. Exiting.")
         sys.exit(1)
 
-    runner = TournamentRunner()
-
-    if choice == 1:
-        _handle_matchup_menu(runner)
-    elif choice == 2:
-        _handle_championship_menu(runner)
-    else:
-        logger.info("Exiting.")
-        sys.exit(0)
+    HANDLERS[choice]()
 
 
 if __name__ == "__main__":
