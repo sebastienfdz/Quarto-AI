@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from quarto_ai.game.types import GameResult
 from quarto_ai.players.base import BaseModel
+from quarto_ai.runners.elo import EloSystem
 from quarto_ai.runners.game_runner import GameRunner
 
 logger = logging.getLogger("quarto_ai.tournament")
@@ -32,6 +33,7 @@ class LeaderboardEntry(TypedDict):
     draws: int
     losses: int
     total_games: int
+    elo: float
 
 
 def _run_single_game_worker(args: tuple[BaseModel, BaseModel]) -> tuple[bool, bool, bool]:
@@ -175,6 +177,17 @@ class TournamentRunner:
         leaderboard[b_name]["total_games"] += total
         leaderboard[b_name]["points"] += (wins_b * 3) + (draws * 1)
 
+        # Update Elo ratings
+        new_elo_a, new_elo_b = EloSystem.calculate_new_ratings(
+            leaderboard[a_name]["elo"],
+            leaderboard[b_name]["elo"],
+            wins_a,
+            wins_b,
+            draws,
+        )
+        leaderboard[a_name]["elo"] = new_elo_a
+        leaderboard[b_name]["elo"] = new_elo_b
+
     def run_championship(
         self,
         players: Sequence[BaseModel],
@@ -203,6 +216,7 @@ class TournamentRunner:
                 "draws": 0,
                 "losses": 0,
                 "total_games": 0,
+                "elo": EloSystem.INITIAL_RATING,
             }
             for p in players
         }
@@ -214,7 +228,7 @@ class TournamentRunner:
             self._update_leaderboard_stats(leaderboard, p_a, p_b, results)
 
         sorted_leaderboard = sorted(
-            leaderboard.values(), key=lambda x: (x["points"], x["wins"]), reverse=True
+            leaderboard.values(), key=lambda x: (x["elo"], x["points"], x["wins"]), reverse=True
         )
         return sorted_leaderboard
 
@@ -248,7 +262,7 @@ class TournamentRunner:
         logger.info("CHAMPIONSHIP LEADERBOARD")
         logger.info("=" * 70)
         logger.info(
-            f"{'Rank':<5} | {'Player':<20} | {'Points':<8} | "
+            f"{'Rank':<5} | {'Player':<20} | {'Elo':<6} | {'Points':<8} | "
             f"{'Wins':<6} | {'Draws':<6} | {'Losses':<6} | {'Win Rate':<8}"
         )
         logger.info("-" * 70)
@@ -256,7 +270,8 @@ class TournamentRunner:
             total = entry["total_games"]
             win_rate = (entry["wins"] / total) * 100 if total > 0 else 0
             logger.info(
-                f"{rank:<5} | {entry['player'].name:<20} | {entry['points']:<8} | "
-                f"{entry['wins']:<6} | {entry['draws']:<6} | {entry['losses']:<6} | {win_rate:.1f}%"
+                f"{rank:<5} | {entry['player'].name:<20} | {int(entry['elo']):<6} | "
+                f"{entry['points']:<8} | {entry['wins']:<6} | {entry['draws']:<6} | "
+                f"{entry['losses']:<6} | {win_rate:.1f}%"
             )
         logger.info("=" * 70 + "\n")
