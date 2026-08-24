@@ -138,8 +138,32 @@ class Minimax(BaseModel):
         :param maximizing_player: The player whose score we are trying to maximize.
         :returns: The heuristic score of the node from the maximizing_player's perspective.
         """
-        # TODO: Implement the alpha-beta minimax algorithm
-        raise NotImplementedError("Alpha-beta minimax not yet implemented.")
+        if state.result is not None or depth == 0:
+            return self._evaluate_for_maximizer(state, maximizing_player)
+
+        is_maximizing = state.current_player == maximizing_player
+        best_score = float("-inf") if is_maximizing else float("inf")
+
+        for move in state.get_legal_moves():
+            clone = state.clone()
+            clone.apply_move(move)
+
+            score = self._minimax_alpha_beta(
+                clone, depth - 1, alpha, beta, maximizing_player
+            )
+
+            if is_maximizing:
+                best_score = max(best_score, score)
+                alpha = max(alpha, best_score)
+                if beta <= alpha:
+                    break
+            else:
+                best_score = min(best_score, score)
+                beta = min(beta, best_score)
+                if beta <= alpha:
+                    break
+
+        return best_score
 
     def _evaluate_for_maximizer(self, state: GameState, maximizing_player: Player) -> float:
         """

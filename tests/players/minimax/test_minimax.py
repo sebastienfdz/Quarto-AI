@@ -31,11 +31,11 @@ def winning_game() -> GameState:
 
 
 # Fixture Minimax
-@pytest.fixture
-def minimax_player() -> Minimax:
-    """A naive Minimax player with a simple evaluator."""
+@pytest.fixture(params=[False, True], ids=["Naive", "AlphaBeta"])
+def minimax_player(request) -> Minimax:
+    """A Minimax player parameterized to test both Naive and Alpha-Beta modes."""
     evaluator = SimpleEvaluator()
-    return Minimax(evaluator=evaluator, depth=2, use_alpha_beta=False)
+    return Minimax(evaluator=evaluator, depth=2, use_alpha_beta=request.param)
 
 
 def test_choose_piece_valid(new_game: GameState, minimax_player: Minimax):
