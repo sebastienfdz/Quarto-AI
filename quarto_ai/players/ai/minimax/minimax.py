@@ -148,9 +148,7 @@ class Minimax(BaseModel):
             clone = state.clone()
             clone.apply_move(move)
 
-            score = self._minimax_alpha_beta(
-                clone, depth - 1, alpha, beta, maximizing_player
-            )
+            score = self._minimax_alpha_beta(clone, depth - 1, alpha, beta, maximizing_player)
 
             if is_maximizing:
                 best_score = max(best_score, score)

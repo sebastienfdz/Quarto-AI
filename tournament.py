@@ -43,7 +43,8 @@ def _handle_championship_menu(runner: TournamentRunner) -> None:
     p3 = MCTS(simulations=1000, name="MCTS-1000")
     p4 = Minimax(evaluator=SimpleEvaluator(), depth=2, use_alpha_beta=False, name="Minimax-d2")
     p5 = Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=False, name="Minimax-d3")
-    players = [p1, p2, p3, p4, p5]
+    p6 = Minimax(evaluator=SimpleEvaluator(), depth=3, use_alpha_beta=True, name="Minimax-d3-AB")
+    players = [p1, p2, p3, p4, p5, p6]
 
     leaderboard = runner.run_championship(players, games, parallel=use_parallel)
     runner.print_championship_report(leaderboard)
@@ -56,7 +57,10 @@ def main() -> None:
     logger.info("=== Quarto Tournament CLI ===")
     logger.info("Select an option:")
     logger.info("1. 1v1 Matchup (RandomAI vs MCTS)")
-    logger.info("2. Championship (RandomAI vs MCTS-100 vs MCTS-1000 vs Minimax-d2 vs Minimax-d3)")
+    logger.info(
+        "2. Championship (RandomAI vs MCTS-100 vs MCTS-1000 vs "
+        "Minimax-d2 vs Minimax-d3 vs Minimax-d3-AB)"
+    )
     logger.info("3. Exit")
 
     try:
