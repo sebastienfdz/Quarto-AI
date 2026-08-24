@@ -221,3 +221,50 @@ def test_full_board_to_str(game_draw: GameState):
     assert printed_phase.startswith("Phase: ")
     for line in lines:
         assert regex.match(line) is not None
+
+
+def test_clone_creates_independent_state(new_game: GameState):
+    """Cloning a game state should create an independent copy with shared immutable pieces."""
+    cloned_game = new_game.clone()
+
+    # Mutable attributes must be new instances
+    assert cloned_game is not new_game
+    assert cloned_game.board is not new_game.board
+    assert cloned_game.remaining_pieces is not new_game.remaining_pieces
+    assert cloned_game.board.game_board is not new_game.board.game_board
+
+    # Immutable attributes must be shared
+    assert cloned_game.current_player is new_game.current_player
+    assert cloned_game.phase is new_game.phase
+    assert cloned_game.next_piece is new_game.next_piece
+    assert cloned_game.result is new_game.result
+
+    # All Piece objects inside the collections must be identical
+    for key, piece in new_game.remaining_pieces.items():
+        assert cloned_game.remaining_pieces[key] is piece
+
+
+def test_clone_mutation_independence(new_game: GameState):
+    """Mutating the cloned state should have zero impact on the original state."""
+    cloned_game = new_game.clone()
+
+    # Select and place a piece on the clone
+    pieces = cloned_game.get_remaining_pieces()
+    square = cloned_game.board.get_available_positions()[0]
+    cloned_game.select_piece(pieces[0])
+    cloned_game.place_piece(*square)
+    cloned_game.select_piece(pieces[1])
+
+    # Original phase and next_piece should be untouched
+    assert new_game.phase == GamePhase.SELECTION
+    assert cloned_game.phase == GamePhase.PLACEMENT
+    assert new_game.next_piece is None
+    assert cloned_game.next_piece is not None
+
+    # Original remaining_pieces should be untouched
+    assert len(new_game.get_remaining_pieces()) == 16
+    assert len(cloned_game.get_remaining_pieces()) == 14
+
+    # Original board should be untouched
+    assert len(new_game.board.get_available_positions()) == 16
+    assert len(cloned_game.board.get_available_positions()) == 15

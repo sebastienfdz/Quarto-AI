@@ -3,12 +3,10 @@ import math
 import random
 
 from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
+from quarto_ai.game.state import GameState, MoveType
 from quarto_ai.players.base import BaseModel
 
-from ...game.types import GamePhase, GameResult, Player
-
-MoveType = tuple[int, int] | Piece | None
+from ...game.types import GameResult, Player
 
 
 class MCTSNode:
@@ -152,7 +150,7 @@ class MCTS(BaseModel):
             parent=None,
             move=None,
             player_who_moved=None,
-            unexplored_moves=self._get_legal_moves(game),
+            unexplored_moves=game.get_legal_moves(),
         )
 
         while i < self.simulations:
@@ -180,7 +178,7 @@ class MCTS(BaseModel):
         """
         while node.is_fully_expanded() and node.children:
             node = node.best_child_selection(self.exploration_weight)
-            self._apply_move(game, node.move)
+            game.apply_move(node.move)
 
         return node, game
 
@@ -194,13 +192,13 @@ class MCTS(BaseModel):
         """
         child_player: Player = game.current_player
         child_move: MoveType = random.choice(node.unexplored_moves)
-        self._apply_move(game, child_move)
+        game.apply_move(child_move)
 
         new_node = MCTSNode(
             parent=node,
             move=child_move,
             player_who_moved=child_player,
-            unexplored_moves=self._get_legal_moves(game),
+            unexplored_moves=game.get_legal_moves(),
         )
         node.children.append(new_node)
         node.unexplored_moves.remove(child_move)
@@ -215,9 +213,9 @@ class MCTS(BaseModel):
         :returns: Result of the simulated game.
         """
         while game.result is None:
-            moves = self._get_legal_moves(game)
+            moves = game.get_legal_moves()
             move = random.choice(moves)
-            self._apply_move(game, move)
+            game.apply_move(move)
         return game.result
 
     def _backpropagate(self, node: MCTSNode, result: GameResult) -> None:
@@ -239,33 +237,3 @@ class MCTS(BaseModel):
             if current_node.parent is None:
                 break
             current_node = current_node.parent
-
-    def _get_legal_moves(self, game: GameState) -> list[MoveType]:
-        """
-        Find every legal moves from a game state position.
-
-        :param game: Game state to generate the legal moves from.
-        """
-        moves: list[MoveType] = []
-
-        if game.phase == GamePhase.PLACEMENT:
-            moves = list(game.board.get_available_positions())
-        elif game.phase == GamePhase.SELECTION:
-            moves = list(game.get_remaining_pieces())
-        return moves
-
-    def _apply_move(self, game: GameState, move: MoveType) -> None:
-        """
-        Apply a single move to the given game state.
-
-        :param game: Game state to apply a move from.
-        :param move: Move to apply to the current game state.
-        """
-        if game.phase == GamePhase.PLACEMENT:
-            if not isinstance(move, tuple):
-                raise TypeError(f"Expected tuple for placement, got {type(move).__name__}")
-            game.place_piece(move[0], move[1])
-        elif game.phase == GamePhase.SELECTION:
-            if not isinstance(move, Piece):
-                raise TypeError(f"Expected Piece for selection, got {type(move).__name__}")
-            game.select_piece(move)

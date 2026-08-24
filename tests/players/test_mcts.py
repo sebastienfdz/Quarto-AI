@@ -4,9 +4,9 @@ import random
 
 import pytest
 
-from quarto_ai.game.state import GameState
+from quarto_ai.game.state import GameState, MoveType
 from quarto_ai.game.types import GameResult, Player
-from quarto_ai.players.ai.mcts import MCTS, MCTSNode, MoveType
+from quarto_ai.players.ai.mcts import MCTS, MCTSNode
 
 
 # Fixture GameState
