@@ -1,8 +1,8 @@
 # Quarto-AI
 
-[![CI](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![Code Coverage](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml)
+[![CI](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml)
+[![Code Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)](https://github.com/sebastienfdz/Quarto-AI/actions)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type Checked: Mypy](https://img.shields.io/badge/type%20checker-mypy%20(strict)-blue.svg)](https://mypy-lang.org/)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9.svg)](https://github.com/astral-sh/uv)
