@@ -49,10 +49,3 @@ python_files = "test_*.py"
 
 [tool.coverage.run]
 omit = ["quarto_ai/interfaces/cli.py"]
-
-[tool.coverage.report]
-exclude_also = [
-    "def print_matchup_report",
-    "def print_championship_report",
-    "if __name__ == .__main__.:",
-]
