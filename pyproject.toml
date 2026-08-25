@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = ["numpy>=2.3.2", "tqdm>=4.67.2"]
 
 [project.optional-dependencies]
-dev = ["ruff", "mypy", "pytest"]
+dev = ["ruff", "mypy", "pytest", "pytest-cov"]
 
 [tool.ruff]
 # Ruff configuration (Linter & Formatter)
@@ -46,3 +46,13 @@ disallow_incomplete_defs = false
 # Pytest configuration
 testpaths = ["tests"]
 python_files = "test_*.py"
+
+[tool.coverage.run]
+omit = ["quarto_ai/interfaces/cli.py"]
+
+[tool.coverage.report]
+exclude_also = [
+    "def print_matchup_report",
+    "def print_championship_report",
+    "if __name__ == .__main__.:",
+]

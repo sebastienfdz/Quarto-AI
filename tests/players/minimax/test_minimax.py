@@ -48,6 +48,7 @@ def mid_game() -> GameState:
     assert game.result is None
     return game
 
+
 # Fixture Minimax
 @pytest.fixture(params=[False, True], ids=["Naive", "AlphaBeta"])
 def minimax_player(request) -> Minimax:
@@ -89,7 +90,10 @@ def test_choose_position_winning(winning_game: GameState, minimax_player: Minima
     x, y = minimax_player.choose_position(winning_game, winning_piece)
     assert (x, y) == (0, 0)
 
-def test_alpha_beta_pruning_reduces_evaluations(mid_game: GameState, monkeypatch: pytest.MonkeyPatch):
+
+def test_alpha_beta_pruning_reduces_evaluations(
+    mid_game: GameState, monkeypatch: pytest.MonkeyPatch
+):
     """Verify that Alpha-Beta pruning evaluates strictly fewer nodes than Naive Minimax."""
     # Mock evaluator to count node evaluations
     evaluator = SimpleEvaluator()
