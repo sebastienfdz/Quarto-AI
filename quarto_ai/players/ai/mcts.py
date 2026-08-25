@@ -78,16 +78,6 @@ class MCTSNode:
         """
         return max(self.children, key=lambda node: node.visits)
 
-    def best_child_play_ratio(self) -> "MCTSNode":
-        """
-        Return the child node to play according to win/loss ratio.
-
-        :returns MCTSNode: The child node with the maximum number of visits.
-        """
-        return max(
-            self.children, key=lambda node: node.wins / node.visits if node.visits > 0 else 0
-        )
-
 
 class MCTS(BaseModel):
     """
