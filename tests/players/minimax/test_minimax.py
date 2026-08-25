@@ -30,6 +30,25 @@ def winning_game() -> GameState:
     return game
 
 
+@pytest.fixture
+def mid_game() -> GameState:
+    """Create a new game of Quarto in the middle of the game (Phase = PLACEMENT)."""
+    game = GameState()
+    pieces = game.get_remaining_pieces()
+    moves = [
+        (pieces[0], (0, 0)),
+        (pieces[1], (1, 1)),
+        (pieces[2], (2, 2)),
+    ]
+
+    for piece, (x, y) in moves:
+        game.select_piece(piece)
+        game.place_piece(x, y)
+
+    assert game.result is None
+    return game
+
+
 # Fixture Minimax
 @pytest.fixture(params=[False, True], ids=["Naive", "AlphaBeta"])
 def minimax_player(request) -> Minimax:
@@ -70,3 +89,36 @@ def test_choose_position_winning(winning_game: GameState, minimax_player: Minima
 
     x, y = minimax_player.choose_position(winning_game, winning_piece)
     assert (x, y) == (0, 0)
+
+
+def test_alpha_beta_pruning_reduces_evaluations(
+    mid_game: GameState, monkeypatch: pytest.MonkeyPatch
+):
+    """Verify that Alpha-Beta pruning evaluates strictly fewer nodes than Naive Minimax."""
+    # Mock evaluator to count node evaluations
+    evaluator = SimpleEvaluator()
+    original_evaluate = evaluator.evaluate
+    eval_count = 0
+
+    def mock_count_evaluate(state: GameState) -> float:
+        nonlocal eval_count
+        eval_count += 1
+        return original_evaluate(state)
+
+    monkeypatch.setattr(evaluator, "evaluate", mock_count_evaluate)
+
+    # Test with naive minimax
+    naive_minimax = Minimax(evaluator=evaluator, depth=4, use_alpha_beta=False)
+    naive_minimax.choose_piece(mid_game.clone())
+    naive_count = eval_count
+
+    eval_count = 0
+
+    # Test with minimax with alpha-beta pruning
+    ab_minimax = Minimax(evaluator=evaluator, depth=4, use_alpha_beta=True)
+    ab_minimax.choose_piece(mid_game.clone())
+    ab_count = eval_count
+
+    assert ab_count < naive_count, (
+        f"Alpha-Beta ({ab_count}) should evaluate fewer nodes than Naive ({naive_count})."
+    )

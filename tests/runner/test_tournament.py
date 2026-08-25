@@ -66,10 +66,13 @@ def test_run_championship_success(
         assert entry["total_games"] == 12
 
     for i in range(len(leaderboard) - 1):
-        assert leaderboard[i]["points"] >= leaderboard[i + 1]["points"]
+        current_entry, next_entry = leaderboard[i], leaderboard[i + 1]
 
-        if leaderboard[i]["points"] == leaderboard[i + 1]["points"]:
-            assert leaderboard[i]["wins"] >= leaderboard[i + 1]["wins"]
+        assert current_entry["elo"] >= next_entry["elo"]
+        if current_entry["elo"] == next_entry["elo"]:
+            assert current_entry["points"] >= next_entry["points"]
+            if current_entry["points"] == next_entry["points"]:
+                assert current_entry["wins"] >= next_entry["wins"]
 
 
 def test_run_championship_invalid_inputs(runner: TournamentRunner, player_a: RandomAI) -> None:
