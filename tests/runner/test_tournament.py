@@ -59,7 +59,8 @@ def test_run_championship_success(
     players = [player_a, player_b, player_c]
     games_per_matchup = 3
 
-    leaderboard = runner.run_championship(players, games_per_matchup, parallel=parallel)
+    results = runner.run_championship(players, games_per_matchup, parallel=parallel)
+    leaderboard = results["leaderboard"]
 
     assert len(leaderboard) == 3
     for entry in leaderboard:

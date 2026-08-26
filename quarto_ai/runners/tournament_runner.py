@@ -36,6 +36,11 @@ class LeaderboardEntry(TypedDict):
     elo: float
 
 
+class ChampionshipResult(TypedDict):
+    leaderboard: list[LeaderboardEntry]
+    matchups: list[MatchupResult]
+
+
 def _run_single_game_worker(args: tuple[BaseModel, BaseModel]) -> tuple[bool, bool, bool]:
     """
     Worker function executed by ProcessPoolExecutor in child processes.
@@ -194,7 +199,7 @@ class TournamentRunner:
         games_per_matchup: int,
         max_workers: int | None = None,
         parallel: bool = True,
-    ) -> list[LeaderboardEntry]:
+    ) -> ChampionshipResult:
         """
         Runs a round-robin tournament where every player plays every other player once.
         Each pair matchup runs games_per_matchup per side.
@@ -221,57 +226,16 @@ class TournamentRunner:
             for p in players
         }
 
+        all_matchups: list[MatchupResult] = []
+
         for p_a, p_b in itertools.combinations(players, 2):
             results = self.run_matchup(
                 p_a, p_b, games_per_matchup, max_workers=max_workers, parallel=parallel
             )
+            all_matchups.append(results)
             self._update_leaderboard_stats(leaderboard, p_a, p_b, results)
 
         sorted_leaderboard = sorted(
             leaderboard.values(), key=lambda x: (x["elo"], x["points"], x["wins"]), reverse=True
         )
-        return sorted_leaderboard
-
-    def print_matchup_report(self, results: MatchupResult) -> None:
-        """Logs a formatted summary of a 1v1 matchup."""
-        total = results["total_games"]
-        a_pct = (results["a_wins"] / total) * 100 if total > 0 else 0
-        b_pct = (results["b_wins"] / total) * 100 if total > 0 else 0
-        draw_pct = (results["draws"] / total) * 100 if total > 0 else 0
-
-        starter_pct = (results["starter_wins"] / total) * 100 if total > 0 else 0
-        follower_pct = (results["follower_wins"] / total) * 100 if total > 0 else 0
-
-        logger.info("\n" + "=" * 50)
-        logger.info(f"MATCHUP REPORT: {results['player_a_name']} vs {results['player_b_name']}")
-        logger.info("=" * 50)
-        logger.info(f"Total Games: {total}")
-        logger.info(f"{results['player_a_name']} Wins: {results['a_wins']} ({a_pct:.1f}%)")
-        logger.info(f"{results['player_b_name']} Wins: {results['b_wins']} ({b_pct:.1f}%)")
-        logger.info(f"Draws: {results['draws']} ({draw_pct:.1f}%)")
-        logger.info("-" * 50)
-        logger.info("Starting Bias Analysis:")
-        logger.info(f"Player 0 (Starter) Wins:  {results['starter_wins']} ({starter_pct:.1f}%)")
-        logger.info(f"Player 1 (Follower) Wins: {results['follower_wins']} ({follower_pct:.1f}%)")
-        logger.info(f"Draws:                     {results['draws']} ({draw_pct:.1f}%)")
-        logger.info("=" * 50 + "\n")
-
-    def print_championship_report(self, leaderboard: list[LeaderboardEntry]) -> None:
-        """Logs a formatted leaderboard table for a championship."""
-        logger.info("\n" + "=" * 70)
-        logger.info("CHAMPIONSHIP LEADERBOARD")
-        logger.info("=" * 70)
-        logger.info(
-            f"{'Rank':<5} | {'Player':<20} | {'Elo':<6} | {'Points':<8} | "
-            f"{'Wins':<6} | {'Draws':<6} | {'Losses':<6} | {'Win Rate':<8}"
-        )
-        logger.info("-" * 70)
-        for rank, entry in enumerate(leaderboard, 1):
-            total = entry["total_games"]
-            win_rate = (entry["wins"] / total) * 100 if total > 0 else 0
-            logger.info(
-                f"{rank:<5} | {entry['player'].name:<20} | {int(entry['elo']):<6} | "
-                f"{entry['points']:<8} | {entry['wins']:<6} | {entry['draws']:<6} | "
-                f"{entry['losses']:<6} | {win_rate:.1f}%"
-            )
-        logger.info("=" * 70 + "\n")
+        return {"leaderboard": sorted_leaderboard, "matchups": all_matchups}

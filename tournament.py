@@ -7,6 +7,7 @@ from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
 from quarto_ai.players.ai.minimax.minimax import Minimax
 from quarto_ai.players.ai.random_ai import RandomAI
 from quarto_ai.players.base import BaseModel
+from quarto_ai.runners.exporter import ConsoleExporter
 from quarto_ai.runners.tournament_runner import TournamentRunner
 
 logger = logging.getLogger("quarto_ai.tournament")
@@ -77,7 +78,7 @@ def _run_matchup() -> None:
 
     logger.info(f"\nStarting 1v1: {player_a.name} vs {player_b.name}...")
     result = runner.run_matchup(player_a, player_b, games, parallel=use_parallel)
-    runner.print_matchup_report(result)
+    ConsoleExporter.print_matchup_report(result)
 
 
 def _run_championship() -> None:
@@ -88,8 +89,8 @@ def _run_championship() -> None:
     runner = TournamentRunner()
 
     logger.info("\nStarting Championship...")
-    leaderboard = runner.run_championship(players, games, parallel=use_parallel)
-    runner.print_championship_report(leaderboard)
+    results = runner.run_championship(players, games, parallel=use_parallel)
+    ConsoleExporter.print_championship_report(results["leaderboard"])
 
 
 def _run_exit() -> None:
