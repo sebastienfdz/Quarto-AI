@@ -28,7 +28,6 @@ class MatchupResult(TypedDict):
 
 class LeaderboardEntry(TypedDict):
     player: BaseModel
-    points: int
     wins: int
     draws: int
     losses: int
@@ -174,13 +173,11 @@ class TournamentRunner:
         leaderboard[a_name]["draws"] += draws
         leaderboard[a_name]["losses"] += wins_b
         leaderboard[a_name]["total_games"] += total
-        leaderboard[a_name]["points"] += (wins_a * 3) + (draws * 1)
 
         leaderboard[b_name]["wins"] += wins_b
         leaderboard[b_name]["draws"] += draws
         leaderboard[b_name]["losses"] += wins_a
         leaderboard[b_name]["total_games"] += total
-        leaderboard[b_name]["points"] += (wins_b * 3) + (draws * 1)
 
         # Update Elo ratings
         new_elo_a, new_elo_b = EloSystem.calculate_new_ratings(
@@ -216,7 +213,6 @@ class TournamentRunner:
         leaderboard: dict[str, LeaderboardEntry] = {
             p.name: {
                 "player": p,
-                "points": 0,
                 "wins": 0,
                 "draws": 0,
                 "losses": 0,
@@ -236,6 +232,6 @@ class TournamentRunner:
             self._update_leaderboard_stats(leaderboard, p_a, p_b, results)
 
         sorted_leaderboard = sorted(
-            leaderboard.values(), key=lambda x: (x["elo"], x["points"], x["wins"]), reverse=True
+            leaderboard.values(), key=lambda x: (x["elo"], x["wins"]), reverse=True
         )
         return {"leaderboard": sorted_leaderboard, "matchups": all_matchups}

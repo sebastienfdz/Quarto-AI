@@ -1,8 +1,11 @@
 import logging
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from quarto_ai.runners.tournament_runner import LeaderboardEntry, MatchupResult
+    from quarto_ai.runners.tournament_runner import LeaderboardEntry, MatchupResult, ChampionshipResult
 
 logger = logging.getLogger("quarto_ai.exporter")
 
@@ -42,7 +45,7 @@ class ConsoleExporter:
         logger.info("CHAMPIONSHIP LEADERBOARD")
         logger.info("=" * 70)
         logger.info(
-            f"{'Rank':<5} | {'Player':<20} | {'Elo':<6} | {'Points':<8} | "
+            f"{'Rank':<5} | {'Player':<20} | {'Elo':<6} | "
             f"{'Wins':<6} | {'Draws':<6} | {'Losses':<6} | {'Win Rate':<8}"
         )
         logger.info("-" * 70)
@@ -53,7 +56,7 @@ class ConsoleExporter:
 
             logger.info(
                 f"{rank:<5} | {entry['player'].name:<20} | {int(entry['elo']):<6} | "
-                f"{entry['points']:<8} | {entry['wins']:<6} | {entry['draws']:<6} | "
+                f"{entry['wins']:<6} | {entry['draws']:<6} | "
                 f"{entry['losses']:<6} | {win_rate:.1f}%"
             )
         logger.info("=" * 70 + "\n")
