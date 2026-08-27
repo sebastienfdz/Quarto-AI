@@ -59,7 +59,8 @@ def test_run_championship_success(
     players = [player_a, player_b, player_c]
     games_per_matchup = 3
 
-    leaderboard = runner.run_championship(players, games_per_matchup, parallel=parallel)
+    results = runner.run_championship(players, games_per_matchup, parallel=parallel)
+    leaderboard = results["leaderboard"]
 
     assert len(leaderboard) == 3
     for entry in leaderboard:
@@ -70,9 +71,7 @@ def test_run_championship_success(
 
         assert current_entry["elo"] >= next_entry["elo"]
         if current_entry["elo"] == next_entry["elo"]:
-            assert current_entry["points"] >= next_entry["points"]
-            if current_entry["points"] == next_entry["points"]:
-                assert current_entry["wins"] >= next_entry["wins"]
+            assert current_entry["wins"] >= next_entry["wins"]
 
 
 def test_run_championship_invalid_inputs(runner: TournamentRunner, player_a: RandomAI) -> None:
