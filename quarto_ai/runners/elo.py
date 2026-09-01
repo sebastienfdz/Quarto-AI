@@ -1,40 +1,125 @@
+from collections.abc import Sequence
+from typing import ClassVar, TypedDict
+
+
+class EloMatchupResult(TypedDict):
+    """Minimal matchup result required by EloSystem.
+
+    Any superset (e.g. MatchupResult from TournamentRunner) is accepted.
+    """
+
+    player_a_name: str
+    player_b_name: str
+    a_wins: int
+    b_wins: int
+    draws: int
+    total_games: int
+
+
 class EloSystem:
     """
-    Computes Elo ratings for players.
-    Acts as a pure math utility, taking raw scores and returning new ratings.
+    Stateless pure-math utility for computing Elo ratings across tournament matchups.
+
+    Uses an Iterative Batch Gradient Descent approach inspired by the Bradley-Terry model
+    to ensure order-invariance, numerical stability across arbitrary game volumes, and strict
+    conservation of the zero-sum rating invariant.
     """
 
-    K_FACTOR: float = 32.0
-    INITIAL_RATING: float = 1500.0
+    K_FACTOR: ClassVar[float] = 8.0
+    INITIAL_RATING: ClassVar[float] = 1500.0
+    CONVERGENCE_THRESHOLD: ClassVar[float] = 0.01
+    MAX_EPOCHS: ClassVar[int] = 1000
 
     @classmethod
-    def calculate_new_ratings(
-        cls, rating_a: float, rating_b: float, a_wins: int, b_wins: int, draws: int
-    ) -> tuple[float, float]:
+    def calculate_ratings(
+        cls,
+        matchups: Sequence[EloMatchupResult],
+    ) -> dict[str, float]:
         """
-        Calculates the new Elo ratings for two players based on a set of games.
+        Computes stable Elo ratings by iterating over all matchup results
+        until convergence, eliminating match-order bias.
 
-        :returns: A tuple of (new_rating_a, new_rating_b)
+        All player ratings are updated simultaneously at the end of each epoch
+        (batch gradient descent), guaranteeing full order-invariance and strict
+        conservation of the zero-sum invariant across the entire player pool.
+
+        :param matchups: Sequence of completed matchup statistics.
+        :returns: A dictionary mapping each player name to their converged Elo rating.
         """
-        n_games = a_wins + b_wins + draws
-        if n_games == 0:
-            return rating_a, rating_b
+        player_names = {
+            name
+            for matchup in matchups
+            for name in (matchup["player_a_name"], matchup["player_b_name"])
+        }
+        ratings: dict[str, float] = dict.fromkeys(player_names, cls.INITIAL_RATING)
 
-        # Expected score total for the matchup
-        expected_a = cls.expected_score(rating_a, rating_b) * n_games
-        expected_b = n_games - expected_a
+        for _ in range(cls.MAX_EPOCHS):
+            deltas: dict[str, float] = dict.fromkeys(player_names, 0.0)
 
-        # Actual score total for the matchup
-        actual_a = a_wins + (0.5 * draws)
-        actual_b = b_wins + (0.5 * draws)
+            for matchup in matchups:
+                player_a = matchup["player_a_name"]
+                player_b = matchup["player_b_name"]
+                delta = cls._calculate_matchup_delta(
+                    ratings[player_a],
+                    ratings[player_b],
+                    matchup["a_wins"],
+                    matchup["b_wins"],
+                    matchup["draws"],
+                    matchup["total_games"],
+                )
+                deltas[player_a] += delta
+                deltas[player_b] -= delta
 
-        # New ratings
-        new_rating_a = rating_a + cls.K_FACTOR * (actual_a - expected_a)
-        new_rating_b = rating_b + cls.K_FACTOR * (actual_b - expected_b)
+            max_delta = 0.0
+            for name in player_names:
+                ratings[name] += deltas[name]
+                max_delta = max(max_delta, abs(deltas[name]))
 
-        return new_rating_a, new_rating_b
+            if max_delta < cls.CONVERGENCE_THRESHOLD:
+                break
+
+        return ratings
+
+    @classmethod
+    def _calculate_matchup_delta(
+        cls,
+        rating_a: float,
+        rating_b: float,
+        a_wins: int,
+        b_wins: int,
+        draws: int,
+        total_games: int,
+    ) -> float:
+        """
+        Calculates the Elo delta for player A from a single matchup.
+
+        Uses win-rate normalization: delta = K * (actual_rate - expected_rate).
+        Normalizing by ``total_games`` bounds the per-epoch delta to [-K, +K]
+        regardless of batch size, preventing score explosion in large tournaments.
+        The delta for player B is always -delta (zero-sum invariant).
+
+        :param rating_a: Current Elo rating of player A.
+        :param rating_b: Current Elo rating of player B.
+        :param a_wins: Number of games won by player A.
+        :param b_wins: Number of games won by player B.
+        :param draws: Number of drawn games.
+        :param total_games: Total number of games played (a_wins + b_wins + draws).
+        :returns: Signed Elo delta for player A. Returns 0.0 if no games were played.
+        """
+        if total_games == 0:
+            return 0.0
+
+        expected_a = cls.expected_score(rating_a, rating_b)
+        actual_rate_a = (a_wins + 0.5 * draws) / total_games
+        return cls.K_FACTOR * (actual_rate_a - expected_a)
 
     @staticmethod
     def expected_score(rating_a: float, rating_b: float) -> float:
-        """Calculates the expected score (win probability) for player A against player B."""
+        """
+        Calculates the expected score (win probability) for player A against player B.
+
+        :param rating_a: Elo rating of player A.
+        :param rating_b: Elo rating of player B.
+        :returns: Expected score in range (0.0, 1.0).
+        """
         return float(1.0 / (1.0 + 10.0 ** ((rating_b - rating_a) / 400.0)))
