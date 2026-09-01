@@ -8,20 +8,14 @@ from tqdm import tqdm
 
 from quarto_ai.game.types import GameResult
 from quarto_ai.players.base import BaseModel
-from quarto_ai.runners.elo import EloSystem
+from quarto_ai.runners.elo import EloMatchupResult, EloSystem
 from quarto_ai.runners.game_runner import GameRunner
 
 logger = logging.getLogger("quarto_ai.tournament")
 
 
-class MatchupResult(TypedDict):
-    player_a_name: str
-    player_b_name: str
+class MatchupResult(EloMatchupResult):
     games_per_side: int
-    total_games: int
-    a_wins: int
-    b_wins: int
-    draws: int
     starter_wins: int
     follower_wins: int
 
@@ -179,17 +173,6 @@ class TournamentRunner:
         leaderboard[b_name]["losses"] += wins_a
         leaderboard[b_name]["total_games"] += total
 
-        # Update Elo ratings
-        new_elo_a, new_elo_b = EloSystem.calculate_new_ratings(
-            leaderboard[a_name]["elo"],
-            leaderboard[b_name]["elo"],
-            wins_a,
-            wins_b,
-            draws,
-        )
-        leaderboard[a_name]["elo"] = new_elo_a
-        leaderboard[b_name]["elo"] = new_elo_b
-
     def run_championship(
         self,
         players: Sequence[BaseModel],
@@ -205,7 +188,7 @@ class TournamentRunner:
         :param games_per_matchup: Games per side for each unique player pair.
         :param max_workers: Maximum process pool workers.
         :param parallel: Whether to use multiprocessing.
-        :return: Sorted leaderboard list.
+        :return: Sorted leaderboard list and matchups.
         """
         if len(players) < 2:
             raise ValueError("Championship requires at least 2 players.")
@@ -230,6 +213,11 @@ class TournamentRunner:
             )
             all_matchups.append(results)
             self._update_leaderboard_stats(leaderboard, p_a, p_b, results)
+
+        # Batch Elo calculation across all completed matchups
+        ratings = EloSystem.calculate_ratings(all_matchups)
+        for name, elo in ratings.items():
+            leaderboard[name]["elo"] = elo
 
         sorted_leaderboard = sorted(
             leaderboard.values(), key=lambda x: (x["elo"], x["wins"]), reverse=True
