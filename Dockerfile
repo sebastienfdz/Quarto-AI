@@ -18,10 +18,12 @@ WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
 COPY quarto_ai/ /app/quarto_ai/
-COPY main.py /app/main.py
+COPY scripts/ /app/scripts/
+COPY main.py /app/
 
 ENV PATH="/app/.venv/bin:$PATH"
 
 USER appuser
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python"]
+CMD ["main.py"]

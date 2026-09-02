@@ -7,7 +7,7 @@
 [![Type Checked: Mypy](https://img.shields.io/badge/type%20checker-mypy%20(strict)-blue.svg)](https://mypy-lang.org/)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9.svg)](https://github.com/astral-sh/uv)
 
-A Python implementation of the abstract strategy board game **Quarto**. This project includes a complete game engine, multiple player types (Human CLI, Heuristic Random, and Monte Carlo Tree Search), and a parallel tournament runner to benchmark agent performance.
+A Python implementation of the abstract strategy board game **Quarto**. This project features a robust game engine, multiple AI agent paradigms (Heuristic Random, Monte Carlo Tree Search, and Minimax with Alpha-Beta Pruning), and a parallel tournament framework with an order-invariant, convergent Elo rating system.
 
 ---
 
@@ -47,59 +47,73 @@ uv sync --all-extras
 
 ### 2. Interactive Play (CLI)
 
-Run the main script to start a game in your terminal:
+Run the interactive terminal interface to play against AI agents or watch them face each other:
 
 ```bash
 uv run python main.py
 ```
 
-Available game modes:
-1. `Human vs Human`
-2. `Human vs RandomAI`
-3. `Human vs MCTS`
-4. `RandomAI vs RandomAI`
-5. `RandomAI vs MCTS`
-6. `MCTS vs MCTS`
+Available modes include `Human vs Human`, `Human vs AI` (RandomAI, MCTS, Minimax), and `AI vs AI` matchups.
 
 ---
 
 ## Tournament & Benchmarking
 
-The project includes a tournament runner that uses Python's `ProcessPoolExecutor` to run games in parallel across CPU cores.
+The project provides two ways to benchmark agents: an interactive tournament CLI and an automated headless benchmarking script.
+
+### 1. Interactive Tournament CLI
+Run custom 1v1 matchups or round-robin championships with live progress feedback:
 
 ```bash
-uv run python tournament.py
+uv run python -m scripts.tournament
 ```
 
-You can run direct 1v1 matchups with configurable simulation counts or a round-robin championship between multiple players.
+### 2. Automated Headless Benchmark
+Run full round-robin tournaments across all configured agents with multiprocessing and export results directly to Markdown:
 
-### Sample Matchup Output
+```bash
+# Run standard benchmark (50 games per side per matchup)
+uv run python -m scripts.benchmark --games 50
 
-```text
-==================================================
-MATCHUP REPORT: RandomAI vs MCTS-1000
-==================================================
-Total Games: 100
-RandomAI Wins: 4 (4.0%)
-MCTS-1000 Wins: 94 (94.0%)
-Draws: 2 (2.0%)
---------------------------------------------------
-Starting Bias Analysis:
-Player 0 (Starter) Wins:  48 (48.0%)
-Player 1 (Follower) Wins: 50 (50.0%)
-Draws:                     2 (2.0%)
-==================================================
+# Custom output path
+uv run python -m scripts.benchmark --games 50 --output benchmarks/custom_report.md
 ```
+
+---
+
+## Benchmark Results (5,600 Games)
+
+Below are the baseline championship results across 8 agents playing 100 games per side (200 games per matchup, 28 matchups, 5,600 total games) using multiprocessing. Ratings are computed via Iterative Batch Gradient Descent Elo.
+
+### Championship Leaderboard
+
+| Rank | Player | Elo | Wins | Draws | Losses | Win Rate |
+|:----:|:-------|----:|-----:|------:|-------:|---------:|
+| 1 | **MCTS-10000** | 1754 (+254) | 958 | 179 | 263 | **68.4%** |
+| 2 | **Minimax-d3-AB** | 1750 (+250) | 920 | 242 | 238 | **65.7%** |
+| 3 | **Minimax-d6-AB** | 1696 (+196) | 640 | 628 | 132 | **45.7%** |
+| 4 | **Minimax-d5-AB** | 1631 (+131) | 648 | 389 | 363 | **46.3%** |
+| 5 | **MCTS-1000** | 1581 (+81) | 683 | 152 | 565 | **48.8%** |
+| 6 | **Minimax-d4-AB** | 1528 (+28) | 542 | 261 | 597 | **38.7%** |
+| 7 | **MCTS-100** | 1143 (-357) | 210 | 26 | 1164 | **15.0%** |
+| 8 | **RandomAI** | 914 (-586) | 59 | 3 | 1338 | **4.2%** |
+
+### Key Findings & Insights
+- **Top Performers**: `MCTS-10000` (1754 Elo) and `Minimax-d3-AB` (1750 Elo) lead the leaderboard with ~68% win rates against the field.
+- **Defensive Robustness at Depth**: `Minimax-d6-AB` achieves the lowest loss rate of the entire tournament (**9.4% losses** across 1,400 games) and forces draws in 44.9% of games against top-tier opponents.
+- **Starting-Player Advantage**: Analysis across all 5,600 games reveals an inherent advantage for the starter (**Player 1: 44.0% wins** vs **Player 2: 39.2% wins**, 16.8% draws).
+
+📄 **[View Full Benchmark Report & Head-to-Head Cross Matrix](benchmarks/results.md)**
 
 ---
 
 ## Development & Testing
 
 ```bash
-# Run the test suite
-uv run pytest
+# Run the test suite with coverage report
+uv run pytest --cov=quarto_ai
 
-# Check types with mypy
+# Check types with mypy (strict mode)
 uv run mypy .
 
 # Lint and check formatting with ruff
@@ -109,24 +123,36 @@ uv run ruff format --check .
 
 ### Docker
 
-A multi-stage `Dockerfile` is provided for containerized execution:
+A lightweight multi-stage `Dockerfile` is provided for containerized execution across all modes:
 
 ```bash
+# Build the image
 docker build -t quarto-ai .
+
+# 1. Interactive Play (default)
 docker run -it --rm quarto-ai
+
+# 2. Interactive Tournament CLI
+docker run -it --rm quarto-ai -m scripts.tournament
+
+# 3. Automated Benchmark
+docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-ai -m scripts.benchmark --games 10
 ```
 
 ---
 
 ## Implementation Details
 
-- **Piece Representation**: Pieces are modeled as 4-bit integers (`height << 3 | color << 2 | shape << 1 | fill`). This allows attribute checks across lines to be calculated with bitwise operations.
-- **State Machine**: The game loop is governed by a state machine that alternates between `GamePhase.SELECTION` and `GamePhase.PLACEMENT`, validating actions against game rules and custom exceptions.
+- **Piece Representation**: Pieces are modeled as 4-bit integers (`height << 3 | color << 2 | shape << 1 | fill`). This allows line attribute checks to be computed in $O(1)$ per piece with bitwise operations.
+- **State Machine**: The game loop is governed by a state machine alternating between `GamePhase.SELECTION` and `GamePhase.PLACEMENT`, validating actions against game rules with a custom exception hierarchy.
 - **Player Interface**: All players implement the `BaseModel` abstract base class (`choose_position`, `choose_piece`), decoupling decision-making logic from the game runner.
 - **Implemented Agents**:
-  - `RandomAI`: Selects an immediate winning move if available; otherwise plays and chooses randomly.
-  - `MCTS`: Monte Carlo Tree Search using UCB1 for node selection and random rollouts for simulation.
-- **Concurrency**: The tournament runner schedules games across worker processes to avoid Python's Global Interpreter Lock (GIL) during CPU-bound rollouts.
+  - `RandomAI`: Immediate winning-move detection with uniform random fallback for position and piece selection.
+  - `MCTS`: Monte Carlo Tree Search using UCB1 for node selection and random rollout simulations.
+  - `Minimax`: Adversarial search supporting optional Alpha-Beta pruning (`use_alpha_beta`), depth in plies (half turns), and dependency injection of heuristic evaluators (`BaseEvaluator`).
+- **Heuristic Evaluator (`SimpleEvaluator`)**: Evaluates alive-line threat density (scoring 2- and 3-piece lines that can still achieve Quarto) from Player 1's perspective.
+- **Convergent Elo Rating System (`EloSystem`)**: Employs an Iterative Batch Gradient Descent algorithm with win-rate normalization ($K=8.0$) to guarantee order-invariance, numerical stability across large game volumes, and zero-sum conservation.
+- **Concurrency**: The tournament runner executes games in parallel across worker processes using Python's `ProcessPoolExecutor` to accelerate large tournament runs.
 
 ---
 
@@ -134,27 +160,34 @@ docker run -it --rm quarto-ai
 
 ```text
 Quarto-AI/
+├── benchmarks/             # Benchmark reports and canonical results
+│   └── results.md          # 5,600-game official baseline report
 ├── quarto_ai/
 │   ├── game/               # Core engine (board, piece, state machine, exceptions)
 │   ├── interfaces/         # CLI user interface
 │   ├── players/            # Player base class and implementations
-│   │   ├── ai/             # AI implementations (RandomAI, MCTS)
+│   │   ├── ai/             # AI implementations (RandomAI, MCTS, Minimax)
+│   │   │   └── minimax/    # Minimax search and heuristic evaluators
 │   │   ├── base.py         # BaseModel ABC
 │   │   └── human.py        # CLI-based human player
-│   └── runners/            # Game runner and parallel tournament runner
-├── tests/                  # Pytest test suite
+│   └── runners/            # Game runner, tournament runner, Elo system, exporters
+│       ├── elo.py          # Iterative Batch Elo rating system
+│       ├── exporter.py     # Console & Markdown report exporters
+│       ├── game_runner.py  # Single-match orchestrator
+│       └── tournament_runner.py # Parallel round-robin tournament engine
+├── scripts/
+│   ├── benchmark.py        # Automated benchmark CLI
+│   └── tournament.py       # Interactive tournament CLI
+├── tests/                  # Pytest test suite (100% passing, 93%+ coverage)
 ├── main.py                 # Interactive game entrypoint
-├── tournament.py           # Tournament benchmarking entrypoint
 ├── Dockerfile              # Container definition
 └── pyproject.toml          # Tooling configuration (Ruff, Mypy, Pytest)
 ```
 
 ---
 
-## Planned Improvements
+## Future Considerations
 
-- **Minimax with Alpha-Beta Pruning**: Add an adversarial tree search agent with heuristic state evaluation.
-- **MCTS Tree Reuse**: Retain and re-root the search tree across successive turns to improve move quality without increasing simulation budgets.
-- **Elo Rating Calculation**: Track relative player ratings across tournament championships.
-- **Architectural Decision Records (ADRs)**: Document key technical choices in `docs/decisions/` (bitwise representation, concurrency model, search algorithms).
-
+- **`AdvancedEvaluator`**: Enhanced heuristic evaluator accounting for piece pool danger and piece-gifting safety in addition to board threats.
+- **Performance Profiling**: Bottleneck profiling (`cProfile`) for deep Minimax and large MCTS search trees.
+- **MCTS Tree Reuse**: Retain and re-root the search tree across successive turns to maximize simulation efficiency.

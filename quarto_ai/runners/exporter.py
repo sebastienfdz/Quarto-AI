@@ -223,6 +223,5 @@ class MarkdownExporter:
             f"| Player 1 (Starter) | {total_starter} | {starter_pct:.1f}% |",
             f"| Player 2 (Follower) | {total_follower} | {follower_pct:.1f}% |",
             f"| Draws | {total_draws} | {draw_pct:.1f}% |",
-            "\n",
         ]
         return "\n".join(lines) + "\n"
