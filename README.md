@@ -123,11 +123,20 @@ uv run ruff format --check .
 
 ### Docker
 
-A multi-stage `Dockerfile` is provided for containerized execution:
+A lightweight multi-stage `Dockerfile` is provided for containerized execution across all modes:
 
 ```bash
+# Build the image
 docker build -t quarto-ai .
+
+# 1. Interactive Play (default)
 docker run -it --rm quarto-ai
+
+# 2. Interactive Tournament CLI
+docker run -it --rm quarto-ai tournament.py
+
+# 3. Automated Benchmark
+docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-ai -m scripts.benchmark --games 10
 ```
 
 ---
