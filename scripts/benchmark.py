@@ -37,8 +37,8 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=str,
-        default="benchmarks/results.md",
-        help="Path to save the benchmark report.",
+        default=None,
+        help="Custom path to save the report (defaults to benchmarks/benchmark_{games}games_YYYYMMDD_HHMMSS.md).",
     )
     args = parser.parse_args()
 
@@ -75,7 +75,11 @@ def main() -> None:
         f"- **Agents**: {', '.join([p.name for p in players])}"
     )
 
-    MarkdownExporter.generate_report(results, args.output, methodology=methodology)
+    output_path = (
+        args.output
+        or f"benchmarks/benchmark_{args.games}games_{datetime.datetime.now():%Y%m%d_%H%M%S}.md"
+    )
+    MarkdownExporter.generate_report(results, output_path, methodology=methodology)
 
 
 if __name__ == "__main__":
