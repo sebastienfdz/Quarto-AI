@@ -19,7 +19,7 @@ WORKDIR /app
 COPY --from=builder /app/.venv /app/.venv
 COPY quarto_ai/ /app/quarto_ai/
 COPY scripts/ /app/scripts/
-COPY main.py tournament.py /app/
+COPY main.py /app/
 
 ENV PATH="/app/.venv/bin:$PATH"
 

@@ -38,7 +38,8 @@ def main() -> None:
         "--output",
         type=str,
         default=None,
-        help="Custom path to save the report (defaults to benchmarks/benchmark_{games}games_YYYYMMDD_HHMMSS.md).",
+        help="Custom path to save the report (defaults to "
+        "benchmarks/benchmark_{games}games_YYYYMMDD_HHMMSS.md).",
     )
     args = parser.parse_args()
 

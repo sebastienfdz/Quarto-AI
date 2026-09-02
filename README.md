@@ -65,7 +65,7 @@ The project provides two ways to benchmark agents: an interactive tournament CLI
 Run custom 1v1 matchups or round-robin championships with live progress feedback:
 
 ```bash
-uv run python tournament.py
+uv run python -m scripts.tournament
 ```
 
 ### 2. Automated Headless Benchmark
@@ -133,7 +133,7 @@ docker build -t quarto-ai .
 docker run -it --rm quarto-ai
 
 # 2. Interactive Tournament CLI
-docker run -it --rm quarto-ai tournament.py
+docker run -it --rm quarto-ai -m scripts.tournament
 
 # 3. Automated Benchmark
 docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-ai -m scripts.benchmark --games 10
@@ -176,10 +176,10 @@ Quarto-AI/
 │       ├── game_runner.py  # Single-match orchestrator
 │       └── tournament_runner.py # Parallel round-robin tournament engine
 ├── scripts/
-│   └── benchmark.py        # Automated benchmark CLI
+│   ├── benchmark.py        # Automated benchmark CLI
+│   └── tournament.py       # Interactive tournament CLI
 ├── tests/                  # Pytest test suite (100% passing, 93%+ coverage)
 ├── main.py                 # Interactive game entrypoint
-├── tournament.py           # Interactive tournament entrypoint
 ├── Dockerfile              # Container definition
 └── pyproject.toml          # Tooling configuration (Ruff, Mypy, Pytest)
 ```
