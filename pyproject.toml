@@ -1,6 +1,6 @@
 [project]
 name = "quarto-ai"
-version = "0.1.0"
+version = "1.0.0"
 description = "Quarto board game engine with AI implementations"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -10,12 +10,10 @@ dependencies = ["numpy>=2.3.2", "tqdm>=4.67.2"]
 dev = ["ruff", "mypy", "pytest", "pytest-cov"]
 
 [tool.ruff]
-# Ruff configuration (Linter & Formatter)
 line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-# Enable specific rule sets
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -29,7 +27,6 @@ select = [
 ignore = []
 
 [tool.mypy]
-# MyPy configuration
 python_version = "3.12"
 strict = true
 ignore_missing_imports = true
@@ -43,7 +40,6 @@ disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
 [tool.pytest.ini_options]
-# Pytest configuration
 testpaths = ["tests"]
 python_files = "test_*.py"
 
