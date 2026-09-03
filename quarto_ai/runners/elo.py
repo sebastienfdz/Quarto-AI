@@ -1,5 +1,8 @@
+import logging
 from collections.abc import Sequence
 from typing import ClassVar, TypedDict
+
+logger = logging.getLogger("quarto_ai.elo")
 
 
 class EloMatchupResult(TypedDict):
@@ -53,7 +56,7 @@ class EloSystem:
         }
         ratings: dict[str, float] = dict.fromkeys(player_names, cls.INITIAL_RATING)
 
-        for _ in range(cls.MAX_EPOCHS):
+        for epoch in range(cls.MAX_EPOCHS):
             deltas: dict[str, float] = dict.fromkeys(player_names, 0.0)
 
             for matchup in matchups:
@@ -76,7 +79,14 @@ class EloSystem:
                 max_delta = max(max_delta, abs(deltas[name]))
 
             if max_delta < cls.CONVERGENCE_THRESHOLD:
+                logger.info("Elo converged after %d epochs.", epoch + 1)
                 break
+        else:
+            logger.warning(
+                "Elo did not converge within %d epochs (max_delta=%.4f).",
+                cls.MAX_EPOCHS,
+                max_delta,
+            )
 
         return ratings
 
