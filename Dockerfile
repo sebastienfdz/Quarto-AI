@@ -17,7 +17,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
-COPY quarto_ai/ /app/quarto_ai/
+COPY quarto_benchmark/ /app/quarto_benchmark/
 COPY scripts/ /app/scripts/
 COPY main.py /app/
 

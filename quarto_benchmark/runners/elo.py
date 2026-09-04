@@ -2,7 +2,7 @@ import logging
 from collections.abc import Sequence
 from typing import ClassVar, TypedDict
 
-logger = logging.getLogger("quarto_ai.elo")
+logger = logging.getLogger("quarto_benchmark.elo")
 
 
 class EloMatchupResult(TypedDict):

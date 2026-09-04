@@ -1,8 +1,8 @@
-# Quarto-AI
+# Quarto-Benchmark
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![CI](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastienfdz/Quarto-AI/actions/workflows/ci.yml)
-[![Code Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)](https://github.com/sebastienfdz/Quarto-AI/actions)
+[![CI](https://github.com/sebastienfdz/Quarto-Benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/sebastienfdz/Quarto-Benchmark/actions/workflows/ci.yml)
+[![Code Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)](https://github.com/sebastienfdz/Quarto-Benchmark/actions)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Type Checked: Mypy](https://img.shields.io/badge/type%20checker-mypy%20(strict)-blue.svg)](https://mypy-lang.org/)
 [![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-DE5FE9.svg)](https://github.com/astral-sh/uv)
@@ -38,8 +38,8 @@ A Python implementation of the abstract strategy board game **Quarto**. This pro
 ### 1. Installation
 
 ```bash
-git clone https://github.com/sebastienfdz/Quarto-AI.git
-cd Quarto-AI
+git clone https://github.com/sebastienfdz/Quarto-Benchmark.git
+cd Quarto-Benchmark
 
 # Install dependencies and dev tools
 uv sync --all-extras
@@ -111,7 +111,7 @@ Below are the baseline championship results across 8 agents playing 100 games pe
 
 ```bash
 # Run the test suite with coverage report
-uv run pytest --cov=quarto_ai
+uv run pytest --cov=quarto_benchmark
 
 # Check types with mypy (strict mode)
 uv run mypy .
@@ -127,16 +127,16 @@ A lightweight multi-stage `Dockerfile` is provided for containerized execution a
 
 ```bash
 # Build the image
-docker build -t quarto-ai .
+docker build -t quarto-benchmark .
 
 # 1. Interactive Play (default)
-docker run -it --rm quarto-ai
+docker run -it --rm quarto-benchmark
 
 # 2. Interactive Tournament CLI
-docker run -it --rm quarto-ai -m scripts.tournament
+docker run -it --rm quarto-benchmark -m scripts.tournament
 
 # 3. Automated Benchmark
-docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-ai -m scripts.benchmark --games 10
+docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-benchmark -m scripts.benchmark --games 10
 ```
 
 ---
@@ -159,10 +159,10 @@ docker run -it --rm -v ./benchmarks:/app/benchmarks quarto-ai -m scripts.benchma
 ## Project Structure
 
 ```text
-Quarto-AI/
+Quarto-Benchmark/
 ├── benchmarks/             # Benchmark reports and canonical results
 │   └── results.md          # 5,600-game official baseline report
-├── quarto_ai/
+├── quarto_benchmark/
 │   ├── game/               # Core engine (board, piece, state machine, exceptions)
 │   ├── interfaces/         # CLI user interface
 │   ├── players/            # Player base class and implementations

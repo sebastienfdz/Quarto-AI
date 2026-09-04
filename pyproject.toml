@@ -1,5 +1,5 @@
 [project]
-name = "quarto-ai"
+name = "quarto-benchmark"
 version = "1.0.0"
 description = "Quarto board game engine with AI implementations"
 readme = "README.md"
@@ -44,4 +44,4 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 
 [tool.coverage.run]
-omit = ["quarto_ai/interfaces/cli.py"]
+omit = ["quarto_benchmark/interfaces/cli.py"]

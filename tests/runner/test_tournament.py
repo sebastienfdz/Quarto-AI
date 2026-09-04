@@ -1,7 +1,7 @@
 import pytest
 
-from quarto_ai.players.ai.random_ai import RandomAI
-from quarto_ai.runners.tournament_runner import TournamentRunner
+from quarto_benchmark.players.ai.random_ai import RandomAI
+from quarto_benchmark.runners.tournament_runner import TournamentRunner
 
 
 @pytest.fixture

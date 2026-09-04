@@ -398,7 +398,7 @@ wheels = [
 ]
 
 [[package]]
-name = "quarto-ai"
+name = "quarto-benchmark"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

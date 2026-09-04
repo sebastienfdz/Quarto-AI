@@ -1,8 +1,8 @@
 import pytest
 
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.players.human import HumanPlayer
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.players.human import HumanPlayer
 
 
 @pytest.fixture

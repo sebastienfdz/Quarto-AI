@@ -3,15 +3,15 @@ import datetime
 import logging
 import time
 
-from quarto_ai.players.ai.mcts import MCTS
-from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
-from quarto_ai.players.ai.minimax.minimax import Minimax
-from quarto_ai.players.ai.random_ai import RandomAI
-from quarto_ai.runners.exporter import MarkdownExporter
-from quarto_ai.runners.tournament_runner import TournamentRunner
+from quarto_benchmark.players.ai.mcts import MCTS
+from quarto_benchmark.players.ai.minimax.evaluator import SimpleEvaluator
+from quarto_benchmark.players.ai.minimax.minimax import Minimax
+from quarto_benchmark.players.ai.random_ai import RandomAI
+from quarto_benchmark.runners.exporter import MarkdownExporter
+from quarto_benchmark.runners.tournament_runner import TournamentRunner
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-logger = logging.getLogger("quarto_ai.benchmark")
+logger = logging.getLogger("quarto_benchmark.benchmark")
 
 
 def main() -> None:

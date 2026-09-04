@@ -1,4 +1,4 @@
-from quarto_ai.game.piece import Piece, generate_all_pieces
+from quarto_benchmark.game.piece import Piece, generate_all_pieces
 
 
 def test_piece_to_bits_zeros():

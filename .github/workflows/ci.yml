@@ -39,7 +39,7 @@ jobs:
         run: uv run mypy .
 
       - name: Run Tests with Pytest and Coverage
-        run: uv run pytest --cov=quarto_ai --cov-report=xml
+        run: uv run pytest --cov=quarto_benchmark --cov-report=xml
 
   docker-build:
     name: Validate Docker Build
@@ -59,6 +59,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-          tags: quarto-ai:latest
+          tags: quarto-benchmark:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

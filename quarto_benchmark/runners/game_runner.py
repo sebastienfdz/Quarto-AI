@@ -1,8 +1,8 @@
 import logging
 
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import GameResult
-from quarto_ai.players.base import BaseModel
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.game.types import GameResult
+from quarto_benchmark.players.base import BaseModel
 
 
 class GameRunner:
@@ -11,7 +11,7 @@ class GameRunner:
     def __init__(self, player0: BaseModel, player1: BaseModel) -> None:
         self.game = GameState()
         self.players = [player0, player1]
-        self.logger = logging.getLogger("quarto_ai.game_runner")
+        self.logger = logging.getLogger("quarto_benchmark.game_runner")
 
     def _display_board(self) -> None:
         """Logs the current board and indicates the active player."""

@@ -1,8 +1,8 @@
 import pytest
 
-from quarto_ai.game.state import GameState
-from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
-from quarto_ai.players.ai.minimax.minimax import Minimax
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.players.ai.minimax.evaluator import SimpleEvaluator
+from quarto_benchmark.players.ai.minimax.minimax import Minimax
 
 
 # Fixture GameState
