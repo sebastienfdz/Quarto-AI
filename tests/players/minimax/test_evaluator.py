@@ -1,9 +1,9 @@
 import pytest
 
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import GameResult
-from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator, evaluate_line
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.game.types import GameResult
+from quarto_benchmark.players.ai.minimax.evaluator import SimpleEvaluator, evaluate_line
 
 
 # Fixture Evaluator

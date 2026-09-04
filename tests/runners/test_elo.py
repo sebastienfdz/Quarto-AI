@@ -1,6 +1,6 @@
 import pytest
 
-from quarto_ai.runners.elo import EloMatchupResult, EloSystem
+from quarto_benchmark.runners.elo import EloMatchupResult, EloSystem
 
 
 @pytest.fixture

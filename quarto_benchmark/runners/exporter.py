@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from quarto_ai.runners.tournament_runner import (
+    from quarto_benchmark.runners.tournament_runner import (
         ChampionshipResult,
         LeaderboardEntry,
         MatchupResult,
     )
 
-logger = logging.getLogger("quarto_ai.exporter")
+logger = logging.getLogger("quarto_benchmark.exporter")
 
 
 class ConsoleExporter:

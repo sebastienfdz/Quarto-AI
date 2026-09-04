@@ -1,15 +1,15 @@
 import logging
 import sys
 
-from quarto_ai.players.ai.mcts import MCTS
-from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
-from quarto_ai.players.ai.minimax.minimax import Minimax
-from quarto_ai.players.ai.random_ai import RandomAI
-from quarto_ai.players.base import BaseModel
-from quarto_ai.players.human import HumanPlayer
-from quarto_ai.runners.game_runner import GameRunner
+from quarto_benchmark.players.ai.mcts import MCTS
+from quarto_benchmark.players.ai.minimax.evaluator import SimpleEvaluator
+from quarto_benchmark.players.ai.minimax.minimax import Minimax
+from quarto_benchmark.players.ai.random_ai import RandomAI
+from quarto_benchmark.players.base import BaseModel
+from quarto_benchmark.players.human import HumanPlayer
+from quarto_benchmark.runners.game_runner import GameRunner
 
-logger = logging.getLogger("quarto_ai.cli")
+logger = logging.getLogger("quarto_benchmark.cli")
 
 MCTS_SIMULATION = 1_000
 GAME_MODES: dict[int, tuple[str, tuple[BaseModel, BaseModel]]] = {

@@ -6,12 +6,12 @@ from typing import TypedDict
 
 from tqdm import tqdm
 
-from quarto_ai.game.types import GameResult
-from quarto_ai.players.base import BaseModel
-from quarto_ai.runners.elo import EloMatchupResult, EloSystem
-from quarto_ai.runners.game_runner import GameRunner
+from quarto_benchmark.game.types import GameResult
+from quarto_benchmark.players.base import BaseModel
+from quarto_benchmark.runners.elo import EloMatchupResult, EloSystem
+from quarto_benchmark.runners.game_runner import GameRunner
 
-logger = logging.getLogger("quarto_ai.tournament")
+logger = logging.getLogger("quarto_benchmark.tournament")
 
 
 class MatchupResult(EloMatchupResult):
@@ -42,7 +42,7 @@ def _run_single_game_worker(args: tuple[BaseModel, BaseModel]) -> tuple[bool, bo
     :return: Tuple of (is_p0_win, is_p1_win, is_draw).
     """
     p0, p1 = args
-    logging.getLogger("quarto_ai").setLevel(logging.WARNING)
+    logging.getLogger("quarto_benchmark").setLevel(logging.WARNING)
     runner = GameRunner(p0, p1)
     runner.run()
     res = runner.game.result
@@ -119,7 +119,7 @@ class TournamentRunner:
 
         desc = f"Matchup: {player_a.name} vs {player_b.name}"
 
-        engine_logger = logging.getLogger("quarto_ai")
+        engine_logger = logging.getLogger("quarto_benchmark")
         original_level = engine_logger.level
         engine_logger.setLevel(logging.WARNING)
 

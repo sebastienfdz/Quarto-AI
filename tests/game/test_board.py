@@ -2,9 +2,9 @@ import re
 
 import pytest
 
-from quarto_ai.game.board import Board
-from quarto_ai.game.exceptions import InvalidSquareError
-from quarto_ai.game.piece import Piece, generate_all_pieces
+from quarto_benchmark.game.board import Board
+from quarto_benchmark.game.exceptions import InvalidSquareError
+from quarto_benchmark.game.piece import Piece, generate_all_pieces
 
 
 @pytest.fixture

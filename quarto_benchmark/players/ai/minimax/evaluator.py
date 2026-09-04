@@ -2,9 +2,9 @@ import abc
 import math
 from typing import ClassVar
 
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import GamePhase, GameResult, Player
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.game.types import GamePhase, GameResult, Player
 
 
 def evaluate_line(line: list[Piece | None]) -> int:

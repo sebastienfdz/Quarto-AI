@@ -1,8 +1,8 @@
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import Player
-from quarto_ai.players.ai.minimax.evaluator import BaseEvaluator
-from quarto_ai.players.base import BaseModel
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.game.types import Player
+from quarto_benchmark.players.ai.minimax.evaluator import BaseEvaluator
+from quarto_benchmark.players.base import BaseModel
 
 
 class Minimax(BaseModel):

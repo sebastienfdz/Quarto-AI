@@ -2,15 +2,15 @@ import logging
 import sys
 from collections.abc import Callable
 
-from quarto_ai.players.ai.mcts import MCTS
-from quarto_ai.players.ai.minimax.evaluator import SimpleEvaluator
-from quarto_ai.players.ai.minimax.minimax import Minimax
-from quarto_ai.players.ai.random_ai import RandomAI
-from quarto_ai.players.base import BaseModel
-from quarto_ai.runners.exporter import ConsoleExporter
-from quarto_ai.runners.tournament_runner import TournamentRunner
+from quarto_benchmark.players.ai.mcts import MCTS
+from quarto_benchmark.players.ai.minimax.evaluator import SimpleEvaluator
+from quarto_benchmark.players.ai.minimax.minimax import Minimax
+from quarto_benchmark.players.ai.random_ai import RandomAI
+from quarto_benchmark.players.base import BaseModel
+from quarto_benchmark.runners.exporter import ConsoleExporter
+from quarto_benchmark.runners.tournament_runner import TournamentRunner
 
-logger = logging.getLogger("quarto_ai.tournament")
+logger = logging.getLogger("quarto_benchmark.tournament")
 
 
 AGENTS: dict[str, BaseModel] = {

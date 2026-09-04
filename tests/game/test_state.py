@@ -2,15 +2,15 @@ import re
 
 import pytest
 
-from quarto_ai.game.exceptions import (
+from quarto_benchmark.game.exceptions import (
     GameEndedError,
     InvalidPhaseError,
     InvalidPieceError,
     InvalidSquareError,
 )
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState
-from quarto_ai.game.types import GamePhase, GameResult, Player
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState
+from quarto_benchmark.game.types import GamePhase, GameResult, Player
 
 
 @pytest.fixture

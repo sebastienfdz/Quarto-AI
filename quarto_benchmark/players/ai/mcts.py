@@ -2,9 +2,9 @@ import copy
 import math
 import random
 
-from quarto_ai.game.piece import Piece
-from quarto_ai.game.state import GameState, MoveType
-from quarto_ai.players.base import BaseModel
+from quarto_benchmark.game.piece import Piece
+from quarto_benchmark.game.state import GameState, MoveType
+from quarto_benchmark.players.base import BaseModel
 
 from ...game.types import GameResult, Player
 
